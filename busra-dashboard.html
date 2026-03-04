@@ -1,0 +1,793 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Busar's Dashboard - Fees Management</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: Arial, sans-serif;
+        }
+        
+        body {
+            background-color: #f5f5f5;
+            color: #333;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        
+        .user-info {
+            background-color: #007bff;
+            color: white;
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .logout-btn {
+            background-color: #dc3545;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        
+        .logout-btn:hover {
+            background-color: #c82333;
+        }
+        
+        h1 {
+            text-align: center;
+            padding: 20px;
+            color: #007bff;
+        }
+        
+        .tabs {
+            display: flex;
+            background-color: #e9ecef;
+            border-bottom: 1px solid #ddd;
+        }
+        
+        .tab {
+            padding: 15px 20px;
+            cursor: pointer;
+            border-right: 1px solid #ddd;
+            transition: background-color 0.3s;
+        }
+        
+        .tab:hover {
+            background-color: #dee2e6;
+        }
+        
+        .tab.active {
+            background-color: white;
+            border-bottom: 3px solid #007bff;
+            font-weight: bold;
+        }
+        
+        .tab-content {
+            display: none;
+            padding: 20px;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        .dashboard-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .stat-card {
+            background-color: #f8f9fa;
+            border: 1px solid #e9ecef;
+            border-radius: 5px;
+            padding: 20px;
+            text-align: center;
+        }
+        
+        .stat-number {
+            font-size: 2em;
+            font-weight: bold;
+            color: #007bff;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        
+        th, td {
+            border: 1px solid #ddd;
+            padding: 12px;
+            text-align: left;
+        }
+        
+        th {
+            background-color: #f2f2f2;
+            font-weight: bold;
+        }
+        
+        tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+        
+        tr:hover {
+            background-color: #f5f5f5;
+        }
+        
+        .form-group {
+            margin-bottom: 15px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        
+        input, select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 16px;
+        }
+        
+        button {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        
+        button:hover {
+            background-color: #0069d9;
+        }
+        
+        .success {
+            background-color: #d4edda;
+            color: #155724;
+            padding: 10px;
+            border-radius: 4px;
+            margin-bottom: 15px;
+        }
+        
+        .error {
+            background-color: #f8d7da;
+            color: #721c24;
+            padding: 10px;
+            border-radius: 4px;
+            margin-bottom: 15px;
+        }
+        
+        .detail-view {
+            display: none;
+            background-color: #f8f9fa;
+            border: 1px solid #e9ecef;
+            border-radius: 5px;
+            padding: 20px;
+            margin-top: 20px;
+        }
+        
+        .detail-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .detail-item {
+            background-color: white;
+            border: 1px solid #e9ecef;
+            border-radius: 4px;
+            padding: 15px;
+        }
+        
+        .detail-label {
+            font-weight: bold;
+            color: #6c757d;
+            font-size: 0.9em;
+            margin-bottom: 5px;
+        }
+        
+        .detail-value {
+            font-size: 1.2em;
+            font-weight: bold;
+        }
+        
+        .search-box {
+            margin-bottom: 20px;
+        }
+        
+        .search-box input {
+            width: 300px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="user-info">
+            Logged in as: <span id="currentUser">Busar (Fees Manager)</span>
+            <button class="logout-btn" onclick="logout()">Logout</button>
+        </div>
+        
+        <h1>Busar's Fees Management Dashboard</h1>
+        
+        <div class="tabs">
+            <div class="tab active" onclick="showTab('overview')">Overview</div>
+            <div class="tab" onclick="showTab('manage')">Manage Payments</div>
+            <div class="tab" onclick="showTab('records')">Payment Records</div>
+        </div>
+        
+        <!-- Overview Tab -->
+        <div id="overview" class="tab-content active">
+            <h2>Fees Overview</h2>
+            
+            <div class="dashboard-stats">
+                <div class="stat-card">
+                    <div class="stat-number" id="totalStudents">0</div>
+                    <div>Total Students</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="totalAmount">UGX 0</div>
+                    <div>Total Fees Amount</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="amountPaid">UGX 0</div>
+                    <div>Total Amount Paid</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="pendingBalance">UGX 0</div>
+                    <div>Pending Balance</div>
+                </div>
+            </div>
+            
+            <h3>Students with Pending Fees</h3>
+            <table id="pendingFeesTable">
+                <thead>
+                    <tr>
+                        <th>Student Name</th>
+                        <th>Class</th>
+                        <th>Total Amount</th>
+                        <th>Amount Paid</th>
+                        <th>Balance</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- Pending fees data will be loaded here -->
+                </tbody>
+            </table>
+        </div>
+        
+        <!-- Manage Payments Tab -->
+        <div id="manage" class="tab-content">
+            <h2>Manage Student Payments</h2>
+            
+            <div class="search-box">
+                <label for="searchStudent">Search Student:</label>
+                <input type="text" id="searchStudent" placeholder="Enter student name or ID" onkeyup="searchStudents()">
+            </div>
+            
+            <table id="studentsTable">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Name</th>
+                        <th>Class</th>
+                        <th>Parent</th>
+                        <th>Total Amount</th>
+                        <th>Amount Paid</th>
+                        <th>Balance</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- Student data will be loaded here -->
+                </tbody>
+            </table>
+            
+            <!-- Payment Form -->
+            <div id="paymentFormContainer" style="display: none; margin-top: 30px;">
+                <h3 id="formTitle">Record Payment</h3>
+                <form id="paymentForm">
+                    <div id="paymentMessage"></div>
+                    
+                    <input type="hidden" id="studentId">
+                    <input type="hidden" id="formMode" value="new">
+                    
+                    <div class="form-group">
+                        <label for="studentName">Student Name:</label>
+                        <input type="text" id="studentName" readonly>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="currentTotal">Current Total Amount (UGX):</label>
+                        <input type="number" id="currentTotal" readonly>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="currentPaid">Current Amount Paid (UGX):</label>
+                        <input type="number" id="currentPaid" readonly>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="currentBalance">Current Balance (UGX):</label>
+                        <input type="number" id="currentBalance" readonly>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="newTotal">Total Amount (UGX):</label>
+                        <input type="number" id="newTotal" min="0" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="amountToPay">Additional Payment (UGX):</label>
+                        <input type="number" id="amountToPay" min="0">
+                        <small>Leave blank when editing existing records to keep current payment amount</small>
+                    </div>
+                    
+                    <button type="submit" id="submitBtn">Record Payment</button>
+                    <button type="button" onclick="cancelPayment()">Cancel</button>
+                </form>
+            </div>
+        </div>
+        
+        <!-- Payment Records Tab -->
+        <div id="records" class="tab-content">
+            <h2>Payment Records</h2>
+            
+            <div class="search-box">
+                <label for="searchRecord">Search Records:</label>
+                <input type="text" id="searchRecord" placeholder="Enter student name or class" onkeyup="searchRecords()">
+            </div>
+            
+            <table id="recordsTable">
+                <thead>
+                    <tr>
+                        <th>Student Name</th>
+                        <th>Class</th>
+                        <th>Total Amount</th>
+                        <th>Amount Paid</th>
+                        <th>Balance</th>
+                        <th>Last Payment Date</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- Records data will be loaded here -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        // Base URL for API calls
+        const BASE_URL = '';
+        
+        // Check if user is logged in
+        window.onload = function() {
+            // In a real system, you would check authentication here
+            // For now, we'll just load the dashboard data
+            loadDashboardData();
+        };
+        
+        // Logout function
+        function logout() {
+            // In a real system, you would clear authentication tokens
+            window.location.href = 'login.html';
+        }
+        
+        // Tab switching functionality
+        function showTab(tabName) {
+            // Hide all tab contents
+            const tabContents = document.getElementsByClassName('tab-content');
+            for (let i = 0; i < tabContents.length; i++) {
+                tabContents[i].classList.remove('active');
+            }
+            
+            // Remove active class from all tabs
+            const tabs = document.getElementsByClassName('tab');
+            for (let i = 0; i < tabs.length; i++) {
+                tabs[i].classList.remove('active');
+            }
+            
+            // Show the selected tab content
+            document.getElementById(tabName).classList.add('active');
+            
+            // Add active class to clicked tab
+            event.currentTarget.classList.add('active');
+            
+            // Load data based on the selected tab
+            switch(tabName) {
+                case 'overview':
+                    loadDashboardData();
+                    break;
+                case 'manage':
+                    loadStudentsData();
+                    break;
+                case 'records':
+                    loadRecordsData();
+                    break;
+            }
+        }
+        
+        // Load dashboard data
+        function loadDashboardData() {
+            // Fetch real data from the server
+            fetch(BASE_URL + '/api/fees/all')
+                .then(response => response.json())
+                .then(data => {
+                    if (data.error) {
+                        console.error('Error loading fees data:', data.error);
+                        return;
+                    }
+                    
+                    // Calculate statistics
+                    let totalStudents = data.length;
+                    let totalAmount = 0;
+                    let amountPaid = 0;
+                    let pendingBalance = 0;
+                    
+                    data.forEach(fee => {
+                        totalAmount += fee.totalAmount || 0;
+                        amountPaid += fee.amountPaid || 0;
+                        pendingBalance += fee.balance || 0;
+                    });
+                    
+                    // Update statistics
+                    document.getElementById('totalStudents').textContent = totalStudents;
+                    document.getElementById('totalAmount').textContent = 'UGX ' + totalAmount.toLocaleString();
+                    document.getElementById('amountPaid').textContent = 'UGX ' + amountPaid.toLocaleString();
+                    document.getElementById('pendingBalance').textContent = 'UGX ' + pendingBalance.toLocaleString();
+                    
+                    // Load pending fees (students with balance > 0)
+                    const pendingFees = data.filter(fee => (fee.balance || 0) > 0);
+                    const tbody = document.querySelector('#pendingFeesTable tbody');
+                    tbody.innerHTML = '';
+                    
+                    if (pendingFees.length === 0) {
+                        tbody.innerHTML = '<tr><td colspan="6" style="text-align: center;">No pending fees</td></tr>';
+                        return;
+                    }
+                    
+                    pendingFees.forEach(fee => {
+                        const row = document.createElement('tr');
+                        row.innerHTML = `
+                            <td>${fee.firstName} ${fee.lastName}</td>
+                            <td>${fee.class}</td>
+                            <td>UGX ${fee.totalAmount ? fee.totalAmount.toLocaleString() : '0'}</td>
+                            <td>UGX ${fee.amountPaid ? fee.amountPaid.toLocaleString() : '0'}</td>
+                            <td>UGX ${fee.balance ? fee.balance.toLocaleString() : '0'}</td>
+                            <td>
+                                <button onclick="openPaymentForm('${fee.id}', '${fee.firstName} ${fee.lastName}', '${fee.totalAmount || 0}', '${fee.amountPaid || 0}', '${fee.balance || 0}')">Record Payment</button>
+                            </td>
+                        `;
+                        tbody.appendChild(row);
+                    });
+                })
+                .catch(error => {
+                    console.error('Error loading dashboard data:', error);
+                });
+        }
+        
+        // Load students data
+        function loadStudentsData() {
+            // Fetch real data from the server
+            Promise.all([
+                fetch(BASE_URL + '/api/students'),
+                fetch(BASE_URL + '/api/fees/all')
+            ])
+                .then(responses => Promise.all(responses.map(res => res.json())))
+                .then(([students, fees]) => {
+                    // Create a map of fees by student ID for easy lookup
+                    const feesMap = {};
+                    fees.forEach(fee => {
+                        feesMap[fee.studentId] = fee;
+                    });
+                    
+                    // Combine student data with fees data
+                    const studentsWithFees = students.map(student => {
+                        const studentFees = feesMap[student.id] || {};
+                        return {
+                            ...student,
+                            totalAmount: studentFees.totalAmount || 0,
+                            amountPaid: studentFees.amountPaid || 0,
+                            balance: studentFees.balance || 0
+                        };
+                    });
+                    
+                    // Load students table
+                    const tbody = document.querySelector('#studentsTable tbody');
+                    tbody.innerHTML = '';
+                    
+                    if (studentsWithFees.length === 0) {
+                        tbody.innerHTML = '<tr><td colspan="8" style="text-align: center;">No students found</td></tr>';
+                        return;
+                    }
+                    
+                    studentsWithFees.forEach(student => {
+                        const row = document.createElement('tr');
+                        row.innerHTML = `
+                            <td>${student.id}</td>
+                            <td>${student.firstName} ${student.lastName}</td>
+                            <td>${student.class}</td>
+                            <td>${student.parentName}</td>
+                            <td>UGX ${student.totalAmount.toLocaleString()}</td>
+                            <td>UGX ${student.amountPaid.toLocaleString()}</td>
+                            <td>UGX ${student.balance.toLocaleString()}</td>
+                            <td>
+                                <button onclick="openPaymentForm('${student.id}', '${student.firstName} ${student.lastName}', '${student.totalAmount}', '${student.amountPaid}', '${student.balance}')">Record Payment</button>
+                            </td>
+                        `;
+                        tbody.appendChild(row);
+                    });
+                })
+                .catch(error => {
+                    console.error('Error loading students data:', error);
+                    const tbody = document.querySelector('#studentsTable tbody');
+                    tbody.innerHTML = '<tr><td colspan="8" style="text-align: center;">Error loading data</td></tr>';
+                });
+        }
+        
+        // Load records data
+        function loadRecordsData() {
+            fetch(BASE_URL + '/api/fees/all')
+                .then(response => response.json())
+                .then(data => {
+                    if (data.error) {
+                        console.error('Error loading records data:', data.error);
+                        return;
+                    }
+                    
+                    const tbody = document.querySelector('#recordsTable tbody');
+                    tbody.innerHTML = '';
+                    
+                    if (data.length === 0) {
+                        tbody.innerHTML = '<tr><td colspan="6" style="text-align: center;">No payment records found</td></tr>';
+                        return;
+                    }
+                    
+                    data.forEach(record => {
+                        const row = document.createElement('tr');
+                        row.innerHTML = `
+                            <td>${record.firstName} ${record.lastName}</td>
+                            <td>${record.class}</td>
+                            <td>UGX ${record.totalAmount ? record.totalAmount.toLocaleString() : '0'}</td>
+                            <td>UGX ${record.amountPaid ? record.amountPaid.toLocaleString() : '0'}</td>
+                            <td>UGX ${record.balance ? record.balance.toLocaleString() : '0'}</td>
+                            <td>${record.paymentDate ? new Date(record.paymentDate).toLocaleDateString() : 'N/A'}</td>
+                            <td>
+                                <button onclick="editRecord('${record.studentId}', '${record.firstName} ${record.lastName}', '${record.totalAmount || 0}', '${record.amountPaid || 0}', '${record.balance || 0}')">Edit</button>
+                            </td>
+                        `;
+                        tbody.appendChild(row);
+                    });
+                })
+                .catch(error => {
+                    console.error('Error loading records data:', error);
+                    const tbody = document.querySelector('#recordsTable tbody');
+                    tbody.innerHTML = '<tr><td colspan="6" style="text-align: center;">Error loading data</td></tr>';
+                });
+        }
+        
+        // Open payment form
+        function openPaymentForm(studentId, studentName, totalAmount, amountPaid, balance) {
+            // Set form values
+            document.getElementById('studentId').value = studentId;
+            document.getElementById('studentName').value = studentName;
+            document.getElementById('currentTotal').value = totalAmount;
+            document.getElementById('currentPaid').value = amountPaid;
+            document.getElementById('currentBalance').value = balance;
+            document.getElementById('newTotal').value = totalAmount;
+            document.getElementById('amountToPay').value = '';
+            
+            // Set form mode to new
+            document.getElementById('formMode').value = 'new';
+            document.getElementById('formTitle').textContent = 'Record Payment';
+            document.getElementById('submitBtn').textContent = 'Record Payment';
+            
+            // Show the form
+            document.getElementById('paymentFormContainer').style.display = 'block';
+            
+            // Scroll to the form
+            document.getElementById('paymentFormContainer').scrollIntoView({ behavior: 'smooth' });
+        }
+        
+        // Cancel payment
+        function cancelPayment() {
+            document.getElementById('paymentFormContainer').style.display = 'none';
+        }
+        
+        // Edit record
+        function editRecord(studentId, studentName, totalAmount, amountPaid, balance) {
+            // Set form values
+            document.getElementById('studentId').value = studentId;
+            document.getElementById('studentName').value = studentName;
+            document.getElementById('currentTotal').value = totalAmount;
+            document.getElementById('currentPaid').value = amountPaid;
+            document.getElementById('currentBalance').value = balance;
+            document.getElementById('newTotal').value = totalAmount;
+            document.getElementById('amountToPay').value = '';
+            
+            // Set form mode to edit
+            document.getElementById('formMode').value = 'edit';
+            document.getElementById('formTitle').textContent = 'Edit Payment Record';
+            document.getElementById('submitBtn').textContent = 'Update Record';
+            
+            // Show the form
+            document.getElementById('paymentFormContainer').style.display = 'block';
+            
+            // Scroll to the form
+            document.getElementById('paymentFormContainer').scrollIntoView({ behavior: 'smooth' });
+        }
+        
+        // Search students
+        function searchStudents() {
+            const searchTerm = document.getElementById('searchStudent').value.toLowerCase();
+            const rows = document.querySelectorAll('#studentsTable tbody tr');
+            
+            rows.forEach(row => {
+                const studentName = row.cells[1].textContent.toLowerCase();
+                const studentClass = row.cells[2].textContent.toLowerCase();
+                
+                if (studentName.includes(searchTerm) || studentClass.includes(searchTerm)) {
+                    row.style.display = '';
+                } else {
+                    row.style.display = 'none';
+                }
+            });
+        }
+        
+        // Search records
+        function searchRecords() {
+            const searchTerm = document.getElementById('searchRecord').value.toLowerCase();
+            const rows = document.querySelectorAll('#recordsTable tbody tr');
+            
+            rows.forEach(row => {
+                const studentName = row.cells[0].textContent.toLowerCase();
+                const studentClass = row.cells[1].textContent.toLowerCase();
+                
+                if (studentName.includes(searchTerm) || studentClass.includes(searchTerm)) {
+                    row.style.display = '';
+                } else {
+                    row.style.display = 'none';
+                }
+            });
+        }
+        
+        // Handle payment form submission
+        document.getElementById('paymentForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const studentId = document.getElementById('studentId').value;
+            const formMode = document.getElementById('formMode').value;
+            const newTotal = parseFloat(document.getElementById('newTotal').value);
+            
+            let paymentData;
+            
+            if (formMode === 'edit') {
+                // For editing, use the values directly from the form
+                const amountToPay = document.getElementById('amountToPay').value;
+                let amountPaid;
+                
+                // If amountToPay is provided, add it to current paid amount
+                // Otherwise, use the current paid amount directly
+                if (amountToPay && amountToPay.trim() !== '') {
+                    const additionalPayment = parseFloat(amountToPay);
+                    if (isNaN(additionalPayment)) {
+                        document.getElementById('paymentMessage').innerHTML = 
+                            '<div class="error">Please enter a valid additional payment amount.</div>';
+                        return;
+                    }
+                    amountPaid = parseFloat(document.getElementById('currentPaid').value) + additionalPayment;
+                } else {
+                    // Use the current amount paid value directly
+                    amountPaid = parseFloat(document.getElementById('currentPaid').value);
+                }
+                
+                // Validate inputs
+                if (isNaN(newTotal) || newTotal < 0) {
+                    document.getElementById('paymentMessage').innerHTML = 
+                        '<div class="error">Please enter a valid total amount.</div>';
+                    return;
+                }
+                
+                if (isNaN(amountPaid) || amountPaid < 0) {
+                    document.getElementById('paymentMessage').innerHTML = 
+                        '<div class="error">Please enter a valid amount paid.</div>';
+                    return;
+                }
+                
+                if (amountPaid > newTotal) {
+                    document.getElementById('paymentMessage').innerHTML = 
+                        '<div class="error">Amount paid cannot be greater than total amount.</div>';
+                    return;
+                }
+                
+                paymentData = {
+                    studentId: studentId,
+                    totalAmount: newTotal,
+                    amountPaid: amountPaid
+                };
+            } else {
+                // For new payments, add the amount to pay to the current amount paid
+                const amountToPay = parseFloat(document.getElementById('amountToPay').value);
+                
+                if (isNaN(newTotal) || isNaN(amountToPay) || amountToPay <= 0) {
+                    document.getElementById('paymentMessage').innerHTML = 
+                        '<div class="error">Please enter valid amounts.</div>';
+                    return;
+                }
+                
+                // Calculate new values
+                const currentPaid = parseFloat(document.getElementById('currentPaid').value);
+                const newAmountPaid = currentPaid + amountToPay;
+                
+                paymentData = {
+                    studentId: studentId,
+                    totalAmount: newTotal,
+                    amountPaid: newAmountPaid
+                };
+            }
+            
+            // Send request to server
+            fetch(BASE_URL + '/api/fees/update', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(paymentData)
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.error) {
+                    document.getElementById('paymentMessage').innerHTML = 
+                        '<div class="error">Error: ' + data.error + '</div>';
+                } else {
+                    // Show success message
+                    const message = formMode === 'edit' ? 'Record updated successfully!' : 'Payment recorded successfully!';
+                    document.getElementById('paymentMessage').innerHTML = 
+                        '<div class="success">' + message + '</div>';
+                    
+                    // Close the form after a delay
+                    setTimeout(() => {
+                        document.getElementById('paymentFormContainer').style.display = 'none';
+                        document.getElementById('paymentMessage').innerHTML = '';
+                        
+                        // Reload data in all tabs
+                        loadDashboardData();
+                        loadStudentsData();
+                        loadRecordsData();
+                    }, 2000);
+                }
+            })
+            .catch(error => {
+                document.getElementById('paymentMessage').innerHTML = 
+                    '<div class="error">Error recording payment: ' + error.message + '</div>';
+            });
+        });
+    </script>
+</body>
+</html>

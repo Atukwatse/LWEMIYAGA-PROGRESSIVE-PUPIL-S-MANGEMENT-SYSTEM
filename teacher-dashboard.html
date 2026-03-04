@@ -1,0 +1,961 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teacher Dashboard - Lwemiyaga Pupils Management System</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1, h2 {
+            color: #2c3e50;
+        }
+        .user-info {
+            text-align: right;
+            margin-bottom: 10px;
+            color: #2c3e50;
+        }
+        .logout-btn {
+            background-color: #dc3545;
+            padding: 5px 10px;
+            font-size: 14px;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        .logout-btn:hover {
+            background-color: #c82333;
+        }
+        .tabs {
+            display: flex;
+            margin-bottom: 20px;
+            border-bottom: 1px solid #ddd;
+        }
+        .tab {
+            padding: 10px 20px;
+            cursor: pointer;
+            background-color: #eee;
+            border: 1px solid #ddd;
+            border-bottom: none;
+            border-radius: 5px 5px 0 0;
+            margin-right: 5px;
+        }
+        .tab.active {
+            background-color: #007bff;
+            color: white;
+        }
+        .tab-content {
+            display: none;
+        }
+        .tab-content.active {
+            display: block;
+        }
+        form {
+            background-color: #f9f9f9;
+            padding: 20px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+        input, select {
+            width: 100%;
+            padding: 8px;
+            margin: 8px 0;
+            box-sizing: border-box;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        button {
+            background-color: #007bff;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 12px;
+            text-align: left;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+        .success {
+            color: green;
+            margin: 10px 0;
+        }
+        .error {
+            color: red;
+            margin: 10px 0;
+        }
+        .dashboard-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        .stat-card {
+            background-color: #e9f7fe;
+            padding: 20px;
+            border-radius: 5px;
+            text-align: center;
+        }
+        .stat-number {
+            font-size: 2em;
+            font-weight: bold;
+            color: #007bff;
+        }
+        .grade-d1, .grade-d2 {
+            background-color: #e8f5e9;
+            color: #2e7d32;
+            padding: 3px 6px;
+            border-radius: 3px;
+            font-weight: bold;
+        }
+        .grade-c3, .grade-c4 {
+            background-color: #fff8e1;
+            color: #f57f17;
+            padding: 3px 6px;
+            border-radius: 3px;
+            font-weight: bold;
+        }
+        .grade-c5, .grade-c6 {
+            background-color: #ffebee;
+            color: #c62828;
+            padding: 3px 6px;
+            border-radius: 3px;
+            font-weight: bold;
+        }
+        .grade-p7, .grade-p8 {
+            background-color: #e3f2fd;
+            color: #1565c0;
+            padding: 3px 6px;
+            border-radius: 3px;
+            font-weight: bold;
+        }
+        .grade-f9 {
+            background-color: #fafafa;
+            color: #616161;
+            padding: 3px 6px;
+            border-radius: 3px;
+            font-weight: bold;
+        }
+        .message-history {
+            max-height: 400px;
+            overflow-y: auto;
+            border: 1px solid #ddd;
+            padding: 10px;
+            margin-top: 10px;
+            border-radius: 4px;
+        }
+        .message-item {
+            padding: 10px;
+            border-bottom: 1px solid #eee;
+        }
+        .message-item:last-child {
+            border-bottom: none;
+        }
+        .message-sender {
+            font-weight: bold;
+            color: #007bff;
+        }
+        .message-date {
+            font-size: 0.8em;
+            color: #777;
+        }
+        .message-content {
+            margin-top: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="user-info">
+            Logged in as: <span id="currentUser">Teacher</span>
+            <button class="logout-btn" onclick="logout()">Logout</button>
+        </div>
+        
+        <h1>Teacher Dashboard</h1>
+        <h2>Subject: <span id="teacherSubject">General</span> | Class: <span id="teacherClass">All Classes</span></h2>
+        
+        <div class="tabs">
+            <div class="tab active" onclick="showTab('students')">Students</div>
+            <div class="tab" onclick="showTab('register')">Register Student</div>
+            <div class="tab" onclick="showTab('performance')">Record Performance</div>
+            <div class="tab" onclick="showTab('reports')">Reports</div>
+            <div class="tab" onclick="showTab('messages')">Messages</div>
+        </div>
+        
+        <!-- Students Tab -->
+        <div id="students" class="tab-content active">
+            <h2>My Students</h2>
+            
+            <div>
+                <label for="classSelect">Select Class:</label>
+                <select id="classSelect" onchange="loadClassStudents()">
+                    <option value="">Select Class</option>
+                    <option value="Baby Class">Baby Class</option>
+                    <option value="Middle Class">Middle Class</option>
+                    <option value="Top Class">Top Class</option>
+                    <option value="P.1">P.1</option>
+                    <option value="P.2">P.2</option>
+                    <option value="P.3">P.3</option>
+                    <option value="P.4">P.4</option>
+                    <option value="P.5">P.5</option>
+                    <option value="P.6">P.6</option>
+                    <option value="P.7">P.7</option>
+                </select>
+            </div>
+            
+            <table id="studentsTable">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Name</th>
+                        <th>Class</th>
+                        <th>Parent</th>
+                        <th>Contact</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- Student data will be loaded here -->
+                </tbody>
+            </table>
+        </div>
+        
+        <!-- Register Student Tab -->
+        <div id="register" class="tab-content">
+            <h2>Register New Student</h2>
+            
+            <form id="studentForm">
+                <div id="registrationMessage"></div>
+                
+                <label for="firstName">First Name:</label>
+                <input type="text" id="firstName" required>
+                
+                <label for="lastName">Last Name:</label>
+                <input type="text" id="lastName" required>
+                
+                <label for="dateOfBirth">Date of Birth:</label>
+                <input type="date" id="dateOfBirth" required>
+                
+                <label for="gender">Gender:</label>
+                <select id="gender" required>
+                    <option value="">Select Gender</option>
+                    <option value="Male">Male</option>
+                    <option value="Female">Female</option>
+                </select>
+                
+                <label for="address">Address:</label>
+                <input type="text" id="address" required>
+                
+                <label for="parentName">Parent/Guardian Name:</label>
+                <input type="text" id="parentName" required>
+                
+                <label for="parentContact">Parent/Guardian Contact:</label>
+                <input type="text" id="parentContact" required>
+                
+                <label for="class">Class:</label>
+                <select id="class" required>
+                    <option value="">Select Class</option>
+                    <option value="Baby Class">Baby Class</option>
+                    <option value="Middle Class">Middle Class</option>
+                    <option value="Top Class">Top Class</option>
+                    <option value="P.1">P.1</option>
+                    <option value="P.2">P.2</option>
+                    <option value="P.3">P.3</option>
+                    <option value="P.4">P.4</option>
+                    <option value="P.5">P.5</option>
+                    <option value="P.6">P.6</option>
+                    <option value="P.7">P.7</option>
+                </select>
+                
+                <button type="submit">Register Student</button>
+            </form>
+        </div>
+        
+        <!-- Performance Tab -->
+        <div id="performance" class="tab-content">
+            <h2>Record Student Performance</h2>
+            
+            <form id="performanceForm">
+                <div id="performanceMessage"></div>
+                
+                <label for="performanceClassSelect">Class:</label>
+                <select id="performanceClassSelect" onchange="loadPerformanceStudents()" required>
+                    <option value="">Select Class</option>
+                    <option value="Baby Class">Baby Class</option>
+                    <option value="Middle Class">Middle Class</option>
+                    <option value="Top Class">Top Class</option>
+                    <option value="P.1">P.1</option>
+                    <option value="P.2">P.2</option>
+                    <option value="P.3">P.3</option>
+                    <option value="P.4">P.4</option>
+                    <option value="P.5">P.5</option>
+                    <option value="P.6">P.6</option>
+                    <option value="P.7">P.7</option>
+                </select>
+                
+                <label for="studentSelect">Student:</label>
+                <select id="studentSelect" required>
+                    <option value="">Select Student</option>
+                    <!-- Options will be populated dynamically -->
+                </select>
+                
+                <input type="hidden" id="teacherId" value="1">
+                
+                <label for="subject">Subject:</label>
+                <select id="subject" required>
+                    <option value="">Select Subject</option>
+                    <option value="Mathematics">Mathematics</option>
+                    <option value="English">English</option>
+                    <option value="Science">Science</option>
+                    <option value="Social Studies">Social Studies</option>
+                    <option value="Creative Arts">Creative Arts</option>
+                </select>
+                
+                <label for="term">Term:</label>
+                <select id="term" required>
+                    <option value="">Select Term</option>
+                    <option value="Term 1">Term 1</option>
+                    <option value="Term 2">Term 2</option>
+                    <option value="Term 3">Term 3</option>
+                </select>
+                
+                <label for="score">Score (%):</label>
+                <input type="number" id="score" min="0" max="100" required>
+                
+                <label for="grade">Grade:</label>
+                <select id="grade" required>
+                    <option value="">Select Grade</option>
+                    <option value="D1">D1</option>
+                    <option value="D2">D2</option>
+                    <option value="C3">C3</option>
+                    <option value="C4">C4</option>
+                    <option value="C5">C5</option>
+                    <option value="C6">C6</option>
+                    <option value="P7">P7</option>
+                    <option value="P8">P8</option>
+                    <option value="F9">F9</option>
+                </select>
+                
+                <button type="submit">Record Performance</button>
+            </form>
+            
+            <h3>Recent Performance Records</h3>
+            <table id="recentPerformanceTable">
+                <thead>
+                    <tr>
+                        <th>Student</th>
+                        <th>Subject</th>
+                        <th>Term</th>
+                        <th>Score</th>
+                        <th>Grade</th>
+                        <th>Date</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- Performance data will be loaded here -->
+                </tbody>
+            </table>
+        </div>
+        
+        <!-- Reports Tab -->
+        <div id="reports" class="tab-content">
+            <h2>Class Performance Reports</h2>
+            
+            <div>
+                <label for="reportClassSelect">Select Class:</label>
+                <select id="reportClassSelect" onchange="loadClassReport()">
+                    <option value="">Select Class</option>
+                    <option value="Baby Class">Baby Class</option>
+                    <option value="Middle Class">Middle Class</option>
+                    <option value="Top Class">Top Class</option>
+                    <option value="P.1">P.1</option>
+                    <option value="P.2">P.2</option>
+                    <option value="P.3">P.3</option>
+                    <option value="P.4">P.4</option>
+                    <option value="P.5">P.5</option>
+                    <option value="P.6">P.6</option>
+                    <option value="P.7">P.7</option>
+                </select>
+            </div>
+            
+            <div class="dashboard-stats">
+                <div class="stat-card">
+                    <div class="stat-number" id="passedCount">0</div>
+                    <div>Students Passed</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="failedCount">0</div>
+                    <div>Students Need Support</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="classAverage">0%</div>
+                    <div>Class Average</div>
+                </div>
+            </div>
+            
+            <table id="classReportTable">
+                <thead>
+                    <tr>
+                        <th>Student Name</th>
+                        <th>Subject</th>
+                        <th>Term</th>
+                        <th>Score</th>
+                        <th>Grade</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- Report data will be loaded here -->
+                </tbody>
+            </table>
+        </div>
+        
+        <!-- Messages Tab -->
+        <div id="messages" class="tab-content">
+            <h2>Messages from Administrator</h2>
+            
+            <div class="message-history" id="teacherMessageHistory">
+                <!-- Messages will be loaded here -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Base URL for API calls
+        const BASE_URL = '';
+        
+        // Store received messages in memory for demo purposes
+        let receivedMessages = [];
+        
+        // Check if user is logged in
+        window.onload = function() {
+            const userRole = localStorage.getItem('userRole');
+            if (!userRole || userRole !== 'teacher') {
+                // Redirect to login page if not logged in as teacher
+                window.location.href = 'login.html';
+                return;
+            }
+            
+            // Display current user and teacher info
+            document.getElementById('currentUser').textContent = 
+                localStorage.getItem('username') + ' (' + userRole + ')';
+            
+            document.getElementById('teacherSubject').textContent = 
+                localStorage.getItem('teacherSubject') || 'General';
+                
+            document.getElementById('teacherClass').textContent = 
+                localStorage.getItem('teacherClass') || 'All Classes';
+                
+            // Load messages for the teacher
+            loadTeacherMessages();
+        };
+        
+        // Logout function
+        function logout() {
+            localStorage.removeItem('userRole');
+            localStorage.removeItem('userId');
+            localStorage.removeItem('username');
+            localStorage.removeItem('teacherSubject');
+            localStorage.removeItem('teacherClass');
+            window.location.href = 'login.html';
+        }
+        
+        // Tab switching functionality
+        function showTab(tabName) {
+            // Hide all tab contents
+            const tabContents = document.getElementsByClassName('tab-content');
+            for (let i = 0; i < tabContents.length; i++) {
+                tabContents[i].classList.remove('active');
+            }
+            
+            // Remove active class from all tabs
+            const tabs = document.getElementsByClassName('tab');
+            for (let i = 0; i < tabs.length; i++) {
+                tabs[i].classList.remove('active');
+            }
+            
+            // Show the selected tab content
+            document.getElementById(tabName).classList.add('active');
+            
+            // Add active class to clicked tab
+            event.currentTarget.classList.add('active');
+            
+            // Load data based on the selected tab
+            switch(tabName) {
+                case 'students':
+                    // Data will be loaded when class is selected
+                    break;
+                case 'register':
+                    // Registration form is ready
+                    break;
+                case 'performance':
+                    loadRecentPerformance();
+                    break;
+                case 'reports':
+                    // Data will be loaded when class is selected
+                    break;
+                case 'messages':
+                    loadTeacherMessages();
+                    break;
+            }
+        }
+        
+        // Load messages for teacher
+        function loadTeacherMessages() {
+            // Get teacher ID from localStorage (for demo, we'll use 1)
+            const teacherId = localStorage.getItem('userId') || 1;
+            
+            fetch(BASE_URL + `/api/messages/teacher/${teacherId}`)
+                .then(response => response.json())
+                .then(messages => {
+                    const container = document.getElementById('teacherMessageHistory');
+                    container.innerHTML = '';
+                    
+                    if (messages.error) {
+                        container.innerHTML = '<p>Error loading messages: ' + messages.error + '</p>';
+                        return;
+                    }
+                    
+                    if (messages.length === 0) {
+                        container.innerHTML = '<p>No messages found.</p>';
+                        return;
+                    }
+                    
+                    messages.forEach(msg => {
+                        const messageDiv = document.createElement('div');
+                        messageDiv.className = 'message-item';
+                        messageDiv.innerHTML = `
+                            <div>
+                                <span class="message-sender">${msg.senderType === 'admin' ? 'Administrator' : 'System'}</span>
+                                <span class="message-date">(${new Date(msg.createdAt).toLocaleString()})</span>
+                            </div>
+                            <div class="message-content">
+                                <strong>${msg.subject}</strong><br>
+                                ${msg.content}
+                            </div>
+                        `;
+                        container.appendChild(messageDiv);
+                    });
+                })
+                .catch(error => {
+                    console.error('Error loading messages:', error);
+                    document.getElementById('teacherMessageHistory').innerHTML = 
+                        '<p>Error loading messages. Please try again later.</p>';
+                });
+        }
+        
+        // Student registration form submission
+        document.getElementById('studentForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            // Get form data
+            const formData = {
+                firstName: document.getElementById('firstName').value,
+                lastName: document.getElementById('lastName').value,
+                dateOfBirth: document.getElementById('dateOfBirth').value,
+                gender: document.getElementById('gender').value,
+                address: document.getElementById('address').value,
+                parentName: document.getElementById('parentName').value,
+                parentContact: document.getElementById('parentContact').value,
+                class: document.getElementById('class').value
+            };
+            
+            // Send data to server
+            fetch(BASE_URL + '/api/students/register', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(formData)
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.error) {
+                    document.getElementById('registrationMessage').innerHTML = 
+                        '<div class="error">Error: ' + data.error + '</div>';
+                } else {
+                    document.getElementById('registrationMessage').innerHTML = 
+                        '<div class="success">Student registered successfully!</div>';
+                    
+                    // Reset form
+                    document.getElementById('studentForm').reset();
+                    
+                    // If user is currently viewing the class where this student was added,
+                    // reload the student list
+                    const currentClass = document.getElementById('classSelect').value;
+                    if (currentClass === formData.class) {
+                        loadClassStudents();
+                    }
+                }
+            })
+            .catch(error => {
+                document.getElementById('registrationMessage').innerHTML = 
+                    '<div class="error">Error registering student: ' + error.message + '</div>';
+            });
+            
+            // Clear the message after 3 seconds
+            setTimeout(() => {
+                document.getElementById('registrationMessage').innerHTML = '';
+            }, 3000);
+        });
+        
+        // Load students for a specific class
+        function loadClassStudents() {
+            const className = document.getElementById('classSelect').value;
+            if (!className) {
+                return;
+            }
+            
+            // Fetch real data from the server
+            fetch(BASE_URL + `/api/classes/${className}/students`)
+                .then(response => response.json())
+                .then(data => {
+                    const tbody = document.querySelector('#studentsTable tbody');
+                    tbody.innerHTML = '';
+                    
+                    if (data.error) {
+                        tbody.innerHTML = `<tr><td colspan="6">Error loading students: ${data.error}</td></tr>`;
+                        return;
+                    }
+                    
+                    data.forEach(student => {
+                        const row = document.createElement('tr');
+                        row.innerHTML = `
+                            <td>${student.id}</td>
+                            <td>${student.firstName} ${student.lastName}</td>
+                            <td>${student.class}</td>
+                            <td>${student.parentName}</td>
+                            <td>${student.parentContact}</td>
+                            <td>
+                                <button onclick="viewPerformance(${student.id}, '${student.firstName} ${student.lastName}')">View Performance</button>
+                                <button onclick="editStudent(${student.id})" style="background-color: #007bff; margin-left: 5px;">Edit</button>
+                                <button onclick="deleteStudent(${student.id})" style="background-color: #dc3545; margin-left: 5px;">Delete</button>
+                            </td>
+                        `;
+                        tbody.appendChild(row);
+                    });
+                })
+                .catch(error => {
+                    const tbody = document.querySelector('#studentsTable tbody');
+                    tbody.innerHTML = `<tr><td colspan="6">Error loading students: ${error.message}</td></tr>`;
+                });
+        }
+        
+        // View performance for a student
+        function viewPerformance(studentId, studentName) {
+            // Fetch student performance data from server
+            fetch(BASE_URL + `/api/performance/student/${studentId}`)
+                .then(response => response.json())
+                .then(performance => {
+                    if (performance.error) {
+                        alert('Error loading performance data: ' + performance.error);
+                        return;
+                    }
+                    
+                    // Create a modal or detailed view to show performance data
+                    showPerformanceDetails(studentId, studentName, performance);
+                })
+                .catch(error => {
+                    alert('Error loading performance data: ' + error.message);
+                });
+        }
+        
+        // Show detailed performance view
+        function showPerformanceDetails(studentId, studentName, performance) {
+            // Create a modal or detailed view
+            const modal = document.createElement('div');
+            modal.style.position = 'fixed';
+            modal.style.top = '50%';
+            modal.style.left = '50%';
+            modal.style.transform = 'translate(-50%, -50%)';
+            modal.style.backgroundColor = 'white';
+            modal.style.padding = '20px';
+            modal.style.border = '1px solid #ccc';
+            modal.style.borderRadius = '8px';
+            modal.style.boxShadow = '0 4px 8px rgba(0,0,0,0.2)';
+            modal.style.zIndex = '1000';
+            modal.style.maxWidth = '80%';
+            modal.style.maxHeight = '80%';
+            modal.style.overflow = 'auto';
+            
+            // Create modal content
+            let performanceHtml = `
+                <h2>Performance Details for ${studentName}</h2>
+                <button onclick="this.parentElement.parentElement.remove()" style="float: right; background-color: #dc3545; color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer;">Close</button>
+                <table style="width: 100%; border-collapse: collapse; margin-top: 20px;">
+                    <thead>
+                        <tr>
+                            <th style="border: 1px solid #ddd; padding: 8px; background-color: #f2f2f2;">Subject</th>
+                            <th style="border: 1px solid #ddd; padding: 8px; background-color: #f2f2f2;">Term</th>
+                            <th style="border: 1px solid #ddd; padding: 8px; background-color: #f2f2f2;">Score</th>
+                            <th style="border: 1px solid #ddd; padding: 8px; background-color: #f2f2f2;">Grade</th>
+                            <th style="border: 1px solid #ddd; padding: 8px; background-color: #f2f2f2;">Date</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+            `;
+            
+            if (performance.length === 0) {
+                performanceHtml += `<tr><td colspan="5" style="border: 1px solid #ddd; padding: 8px; text-align: center;">No performance records found</td></tr>`;
+            } else {
+                performance.forEach(record => {
+                    performanceHtml += `
+                        <tr>
+                            <td style="border: 1px solid #ddd; padding: 8px;">${record.subject}</td>
+                            <td style="border: 1px solid #ddd; padding: 8px;">${record.term}</td>
+                            <td style="border: 1px solid #ddd; padding: 8px;">${record.score}%</td>
+                            <td style="border: 1px solid #ddd; padding: 8px;">${record.grade}</td>
+                            <td style="border: 1px solid #ddd; padding: 8px;">${new Date(record.createdAt).toLocaleDateString()}</td>
+                        </tr>
+                    `;
+                });
+            }
+            
+            performanceHtml += `
+                    </tbody>
+                </table>
+            `;
+            
+            modal.innerHTML = performanceHtml;
+            document.body.appendChild(modal);
+            
+            // Add overlay to dim background
+            const overlay = document.createElement('div');
+            overlay.style.position = 'fixed';
+            overlay.style.top = '0';
+            overlay.style.left = '0';
+            overlay.style.width = '100%';
+            overlay.style.height = '100%';
+            overlay.style.backgroundColor = 'rgba(0,0,0,0.5)';
+            overlay.style.zIndex = '999';
+            overlay.onclick = function() {
+                modal.remove();
+                overlay.remove();
+            };
+            document.body.appendChild(overlay);
+        }
+        
+        // Delete student
+        function deleteStudent(studentId) {
+            if (confirm('Are you sure you want to delete this student? This action cannot be undone.')) {
+                fetch(BASE_URL + '/api/students/' + studentId, {
+                    method: 'DELETE'
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.error) {
+                        alert('Error deleting student: ' + data.error);
+                    } else {
+                        alert('Student deleted successfully!');
+                        // Reload students data
+                        loadClassStudents();
+                    }
+                })
+                .catch(error => {
+                    alert('Error deleting student: ' + error.message);
+                });
+            }
+        }
+        
+        // Edit student
+        function editStudent(studentId) {
+            // For now, we'll just show an alert
+            // In a real implementation, this would open an edit form
+            alert(`Editing student with ID: ${studentId}`);
+        }
+        
+        // Load students for performance recording
+        function loadPerformanceStudents() {
+            const className = document.getElementById('performanceClassSelect').value;
+            if (!className) {
+                document.getElementById('studentSelect').innerHTML = '<option value="">Select Student</option>';
+                return;
+            }
+            
+            // Fetch real data from the server
+            fetch(BASE_URL + `/api/classes/${className}/students`)
+                .then(response => response.json())
+                .then(data => {
+                    const select = document.getElementById('studentSelect');
+                    select.innerHTML = '<option value="">Select Student</option>';
+                    
+                    if (data.error) {
+                        return;
+                    }
+                    
+                    data.forEach(student => {
+                        const option = document.createElement('option');
+                        option.value = student.id;
+                        option.textContent = `${student.firstName} ${student.lastName}`;
+                        select.appendChild(option);
+                    });
+                })
+                .catch(error => {
+                    console.error('Error loading students:', error);
+                });
+        }
+        
+        // Load recent performance records
+        function loadRecentPerformance() {
+            // Fetch real data from the server
+            fetch(BASE_URL + '/api/classes/P.5/performance')  // Default to P.5 class
+                .then(response => response.json())
+                .then(data => {
+                    const tbody = document.querySelector('#recentPerformanceTable tbody');
+                    tbody.innerHTML = '';
+                    
+                    if (data.error) {
+                        tbody.innerHTML = `<tr><td colspan="6">Error loading performance data: ${data.error}</td></tr>`;
+                        return;
+                    }
+                    
+                    data.forEach(record => {
+                        const row = document.createElement('tr');
+                        row.innerHTML = `
+                            <td>${record.firstName} ${record.lastName}</td>
+                            <td>${record.subject}</td>
+                            <td>${record.term}</td>
+                            <td>${record.score}%</td>
+                            <td><span class="grade-${record.grade.toLowerCase()}">${record.grade}</span></td>
+                            <td>${new Date(record.createdAt).toLocaleDateString()}</td>
+                        `;
+                        tbody.appendChild(row);
+                    });
+                })
+                .catch(error => {
+                    const tbody = document.querySelector('#recentPerformanceTable tbody');
+                    tbody.innerHTML = `<tr><td colspan="6">Error loading performance data: ${error.message}</td></tr>`;
+                });
+        }
+        
+        // Performance form submission
+        document.getElementById('performanceForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            // Get form data
+            const formData = {
+                studentId: document.getElementById('studentSelect').value,
+                subject: document.getElementById('subject').value,
+                term: document.getElementById('term').value,
+                score: parseInt(document.getElementById('score').value),
+                grade: document.getElementById('grade').value,
+                teacherId: document.getElementById('teacherId').value || 1
+            };
+            
+            // Validate form data
+            if (!formData.studentId || !formData.subject || !formData.term || isNaN(formData.score) || !formData.grade) {
+                document.getElementById('performanceMessage').innerHTML = 
+                    '<div class="error">Please fill in all fields correctly.</div>';
+                return;
+            }
+            
+            // Send data to server
+            fetch(BASE_URL + '/api/performance/add', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(formData)
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.error) {
+                    document.getElementById('performanceMessage').innerHTML = 
+                        '<div class="error">Error: ' + data.error + '</div>';
+                } else {
+                    document.getElementById('performanceMessage').innerHTML = 
+                        '<div class="success">Performance recorded successfully!</div>';
+                    
+                    // Reset form
+                    document.getElementById('performanceForm').reset();
+                    
+                    // Reload recent performance
+                    loadRecentPerformance();
+                }
+            })
+            .catch(error => {
+                document.getElementById('performanceMessage').innerHTML = 
+                    '<div class="error">Error recording performance: ' + error.message + '</div>';
+            });
+            
+            // Clear the message after 3 seconds
+            setTimeout(() => {
+                document.getElementById('performanceMessage').innerHTML = '';
+            }, 3000);
+        });
+        
+        // Load class report
+        function loadClassReport() {
+            const className = document.getElementById('reportClassSelect').value;
+            if (!className) {
+                return;
+            }
+            
+            // Fetch real data from the server
+            fetch(BASE_URL + `/api/classes/${className}/performance`)
+                .then(response => response.json())
+                .then(data => {
+                    // Calculate statistics
+                    if (data.length > 0) {
+                        // For demo, we'll just show basic stats
+                        document.getElementById('passedCount').textContent = data.filter(r => r.score >= 50).length;
+                        document.getElementById('failedCount').textContent = data.filter(r => r.score < 50).length;
+                        
+                        // Calculate average
+                        const totalScore = data.reduce((sum, record) => sum + record.score, 0);
+                        const average = data.length > 0 ? Math.round(totalScore / data.length) : 0;
+                        document.getElementById('classAverage').textContent = `${average}%`;
+                    }
+                    
+                    const tbody = document.querySelector('#classReportTable tbody');
+                    tbody.innerHTML = '';
+                    
+                    if (data.error) {
+                        tbody.innerHTML = `<tr><td colspan="5">Error loading report data: ${data.error}</td></tr>`;
+                        return;
+                    }
+                    
+                    data.forEach(record => {
+                        const row = document.createElement('tr');
+                        row.innerHTML = `
+                            <td>${record.firstName} ${record.lastName}</td>
+                            <td>${record.subject}</td>
+                            <td>${record.term}</td>
+                            <td>${record.score}%</td>
+                            <td><span class="grade-${record.grade.toLowerCase()}">${record.grade}</span></td>
+                        `;
+                        tbody.appendChild(row);
+                    });
+                })
+                .catch(error => {
+                    const tbody = document.querySelector('#classReportTable tbody');
+                    tbody.innerHTML = `<tr><td colspan="5">Error loading report data: ${error.message}</td></tr>`;
+                });
+        }
+    </script>
+</body>
+</html>

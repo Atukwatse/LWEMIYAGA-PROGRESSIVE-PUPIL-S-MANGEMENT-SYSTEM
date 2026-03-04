@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lwemiyaga Pupils Management - Login</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f2f5;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+        .login-container {
+            background-color: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            width: 350px;
+            text-align: center;
+        }
+        .logo {
+            margin-bottom: 20px;
+        }
+        .logo h1 {
+            color: #2c3e50;
+            margin: 0;
+            font-size: 24px;
+        }
+        .logo p {
+            color: #7f8c8d;
+            margin: 5px 0 20px;
+        }
+        .form-group {
+            margin-bottom: 15px;
+            text-align: left;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            color: #2c3e50;
+            font-weight: bold;
+        }
+        input, select {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+        button {
+            width: 100%;
+            padding: 12px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            margin-top: 10px;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        .error {
+            color: red;
+            margin-top: 10px;
+            display: none;
+        }
+        .role-selection {
+            margin: 20px 0;
+        }
+        .role-option {
+            display: inline-block;
+            margin: 0 10px;
+        }
+        .role-option input {
+            width: auto;
+            margin-right: 5px;
+        }
+        .login-instructions {
+            background-color: #e9f7fe;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 15px 0;
+            text-align: left;
+            font-size: 14px;
+        }
+        .login-instructions h3 {
+            margin-top: 0;
+            color: #2c3e50;
+        }
+        .login-instructions ul {
+            padding-left: 20px;
+        }
+        .login-instructions li {
+            margin-bottom: 8px;
+        }
+        #parentInfo {
+            display: none;
+            background-color: #fff8e1;
+            padding: 15px;
+            border-radius: 5px;
+            margin-top: 15px;
+        }
+    </style>
+</head>
+<body>
+    <div class="login-container">
+        <div class="logo">
+            <h1>Lwemiyaga Progressive</h1>
+            <p>Pupils Management System</p>
+        </div>
+        
+        <div class="login-instructions">
+            <h3>Login Instructions</h3>
+            <ul>
+                <li><strong>Administrator:</strong> Username: admin, Password: admin123</li>
+                <li><strong>Teacher:</strong> Any email address, Password: teacher123</li>
+                <li><strong>Parent:</strong> Any credentials, then enter child details</li>
+                <li><strong>Fees Manager (Busar):</strong> Username: busar, Password: busar123</li>
+            </ul>
+        </div>
+        
+        <form id="loginForm">
+            <div class="form-group">
+                <label for="role">Login As:</label>
+                <select id="role" required onchange="toggleParentInfo()">
+                    <option value="">Select Role</option>
+                    <option value="admin">Administrator</option>
+                    <option value="teacher">Teacher</option>
+                    <option value="parent">Parent</option>
+                    <option value="busar">Fees Manager (Busar)</option>
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label for="username">Username/Email:</label>
+                <input type="text" id="username" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="password">Password:</label>
+                <input type="password" id="password" required>
+            </div>
+            
+            <div id="parentInfo">
+                <h3>Child Information</h3>
+                <div class="form-group">
+                    <label for="childName">Child's Name:</label>
+                    <input type="text" id="childName" placeholder="Enter your child's name">
+                </div>
+                <div class="form-group">
+                    <label for="childClass">Child's Class:</label>
+                    <select id="childClass">
+                        <option value="">Select Class</option>
+                        <option value="Baby Class">Baby Class</option>
+                        <option value="Middle Class">Middle Class</option>
+                        <option value="Top Class">Top Class</option>
+                        <option value="P.1">P.1</option>
+                        <option value="P.2">P.2</option>
+                        <option value="P.3">P.3</option>
+                        <option value="P.4">P.4</option>
+                        <option value="P.5">P.5</option>
+                        <option value="P.6">P.6</option>
+                        <option value="P.7">P.7</option>
+                    </select>
+                </div>
+            </div>
+            
+            <button type="submit">Login</button>
+            
+            <div id="errorMessage" class="error"></div>
+        </form>
+    </div>
+
+    <script>
+        function toggleParentInfo() {
+            const role = document.getElementById('role').value;
+            const parentInfo = document.getElementById('parentInfo');
+            if (role === 'parent') {
+                parentInfo.style.display = 'block';
+            } else {
+                parentInfo.style.display = 'none';
+            }
+        }
+        
+        document.getElementById('loginForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const role = document.getElementById('role').value;
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            const errorMessage = document.getElementById('errorMessage');
+            
+            // Hide any previous error message
+            errorMessage.style.display = 'none';
+            
+            // Handle different roles
+            if (role === 'admin') {
+                // Admin login
+                if (username === 'admin' && password === 'admin123') {
+                    // Successful login - redirect to main system
+                    localStorage.setItem('userRole', 'admin');
+                    localStorage.setItem('userId', '1');
+                    localStorage.setItem('username', username);
+                    window.location.href = 'admin-dashboard.html';
+                } else {
+                    errorMessage.textContent = 'Invalid admin credentials. Use username: admin, password: admin123';
+                    errorMessage.style.display = 'block';
+                }
+            } else if (role === 'teacher') {
+                // Teacher login - check against database
+                fetch('/api/teachers/login', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        email: username,
+                        password: password
+                    })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.error) {
+                        errorMessage.textContent = data.error;
+                        errorMessage.style.display = 'block';
+                    } else {
+                        // Successful login - redirect to teacher dashboard
+                        localStorage.setItem('userRole', 'teacher');
+                        localStorage.setItem('userId', data.id.toString());
+                        localStorage.setItem('username', data.firstName + ' ' + data.lastName);
+                        localStorage.setItem('teacherSubject', data.subject || 'General');
+                        localStorage.setItem('teacherClass', data.classAssigned || 'All Classes');
+                        window.location.href = 'teacher-dashboard.html';
+                    }
+                })
+                .catch(error => {
+                    errorMessage.textContent = 'Error during login: ' + error.message;
+                    errorMessage.style.display = 'block';
+                });
+            } else if (role === 'parent') {
+                const childName = document.getElementById('childName').value;
+                const childClass = document.getElementById('childClass').value;
+                
+                if (!childName || !childClass) {
+                    errorMessage.textContent = 'Please enter your child\'s name and class.';
+                    errorMessage.style.display = 'block';
+                    return;
+                }
+                
+                // Find the student by name and class
+                fetch(`/api/students/by-name-class?name=${encodeURIComponent(childName)}&class=${encodeURIComponent(childClass)}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.error) {
+                            errorMessage.textContent = 'Child not found. Please check the name and class.';
+                            errorMessage.style.display = 'block';
+                            return;
+                        }
+                        
+                        // Successful login - redirect to parent dashboard
+                        localStorage.setItem('userRole', 'parent');
+                        localStorage.setItem('username', username);
+                        localStorage.setItem('childName', childName);
+                        localStorage.setItem('childClass', childClass);
+                        localStorage.setItem('childId', data.id.toString());
+                        window.location.href = 'parent-dashboard.html';
+                    })
+                    .catch(error => {
+                        errorMessage.textContent = 'Error finding child: ' + error.message;
+                        errorMessage.style.display = 'block';
+                    });
+            } else if (role === 'busar') {
+                // Busar login - simple authentication for demo
+                if (username === 'busar' && password === 'busar123') {
+                    // Successful login - redirect to Busar's dashboard
+                    localStorage.setItem('userRole', 'busar');
+                    localStorage.setItem('username', username);
+                    window.location.href = 'busra-dashboard.html';
+                } else {
+                    errorMessage.textContent = 'Invalid credentials. Use username: busar, password: busar123';
+                    errorMessage.style.display = 'block';
+                }
+            } else {
+                errorMessage.textContent = 'Please select a role.';
+                errorMessage.style.display = 'block';
+            }
+        });
+    </script>
+</body>
+</html>

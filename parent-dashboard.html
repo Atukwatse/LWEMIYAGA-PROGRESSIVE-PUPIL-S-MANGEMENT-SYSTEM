@@ -1,0 +1,192 @@
+        // Load parent dashboard data
+        function loadParentDashboardData() {
+            // Get child ID from localStorage
+            const childId = localStorage.getItem('childId');
+            if (!childId) {
+                console.error('Child ID not found in localStorage');
+                return;
+            }
+            
+            // Fetch real data from the server
+            Promise.all([
+                fetch(BASE_URL + `/api/students/${childId}`),
+                fetch(BASE_URL + `/api/performance/student/${childId}`),
+                fetch(BASE_URL + `/api/fees/student/${childId}`)
+            ])
+            .then(responses => Promise.all(responses.map(res => res.json())))
+            .then(([student, performance, fees]) => {
+                if (student.error || performance.error || fees.error) {
+                    console.error('Error loading data:', student.error || performance.error || fees.error);
+                    return;
+                }
+                
+                // Update child info if not already set
+                if (!localStorage.getItem('childName')) {
+                    localStorage.setItem('childName', `${student.firstName} ${student.lastName}`);
+                    localStorage.setItem('childClass', student.class);
+                    document.getElementById('childInfo').textContent = `${student.firstName} ${student.lastName} (${student.class})`;
+                }
+                
+                // Calculate average score
+                if (performance.length > 0) {
+                    const totalScore = performance.reduce((sum, record) => sum + record.score, 0);
+                    const average = Math.round(totalScore / performance.length);
+                    document.getElementById('averageScore').textContent = `${average}%`;
+                } else {
+                    document.getElementById('averageScore').textContent = '0%';
+                }
+                
+                // Set fees status
+                if (fees) {
+                    document.getElementById('feesStatus').innerHTML = 
+                        fees.balance > 0 ? 
+                        `<span class="fees-due">UGX ${fees.balance.toLocaleString()} Due</span>` : 
+                        `<span class="fees-paid">All Paid</span>`;
+                    
+                    document.getElementById('subjectsCount').textContent = performance.length;
+                }
+                
+                // Load recent performance (last 3 records)
+                const recentPerformance = performance.slice(0, 3);
+                const tbody = document.querySelector('#recentPerformanceTable tbody');
+                tbody.innerHTML = '';
+                
+                recentPerformance.forEach(record => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>${record.subject}</td>
+                        <td>${record.term}</td>
+                        <td>${record.score}%</td>
+                        <td>${record.grade}</td>
+                        <td>${new Date(record.createdAt).toLocaleDateString()}</td>
+                    `;
+                    tbody.appendChild(row);
+                });
+            })
+            .catch(error => {
+                console.error('Error loading parent dashboard data:', error);
+            });
+        }
+        
+        // Load performance data
+        function loadPerformanceData() {
+            // Get child ID from localStorage
+            const childId = localStorage.getItem('childId');
+            if (!childId) {
+                console.error('Child ID not found in localStorage');
+                return;
+            }
+            
+            // Fetch real data from the server
+            fetch(BASE_URL + `/api/performance/student/${childId}`)
+                .then(response => response.json())
+                .then(performance => {
+                    if (performance.error) {
+                        console.error('Error loading performance data:', performance.error);
+                        return;
+                    }
+                    
+                    const tbody = document.querySelector('#performanceTable tbody');
+                    tbody.innerHTML = '';
+                    
+                    if (performance.length === 0) {
+                        tbody.innerHTML = '<tr><td colspan="5" style="text-align: center;">No performance records found</td></tr>';
+                        return;
+                    }
+                    
+                    performance.forEach(record => {
+                        const row = document.createElement('tr');
+                        row.innerHTML = `
+                            <td>${record.subject}</td>
+                            <td>${record.term}</td>
+                            <td>${record.score}%</td>
+                            <td>${record.grade}</td>
+                            <td>${new Date(record.createdAt).toLocaleDateString()}</td>
+                        `;
+                        tbody.appendChild(row);
+                    });
+                })
+                .catch(error => {
+                    console.error('Error loading performance data:', error);
+                });
+        }
+        
+        // Load fees data
+        function loadFeesData() {
+            // Get child ID from localStorage
+            const childId = localStorage.getItem('childId');
+            if (!childId) {
+                console.error('Child ID not found in localStorage');
+                return;
+            }
+            
+            // Fetch real data from the server
+            fetch(BASE_URL + `/api/fees/student/${childId}`)
+                .then(response => response.json())
+                .then(fees => {
+                    if (fees.error) {
+                        console.error('Error loading fees data:', fees.error);
+                        return;
+                    }
+                    
+                    // Update fees information
+                    document.getElementById('totalAmount').textContent = fees.totalAmount ? `UGX ${fees.totalAmount.toLocaleString()}` : 'UGX 0';
+                    document.getElementById('amountPaid').textContent = fees.amountPaid ? `UGX ${fees.amountPaid.toLocaleString()}` : 'UGX 0';
+                    document.getElementById('balance').textContent = fees.balance ? `UGX ${fees.balance.toLocaleString()}` : 'UGX 0';
+                    
+                    // Load fees history (in a real system, this would be a separate endpoint)
+                    const tbody = document.querySelector('#feesHistoryTable tbody');
+                    tbody.innerHTML = '<tr><td colspan="3" style="text-align: center;">No payment history available</td></tr>';
+                })
+                .catch(error => {
+                    console.error('Error loading fees data:', error);
+                });
+        }
+        
+        // Logout function
+        function logout() {
+            localStorage.removeItem('userRole');
+            localStorage.removeItem('userId');
+            localStorage.removeItem('username');
+            localStorage.removeItem('childName');
+            localStorage.removeItem('childClass');
+            localStorage.removeItem('childId');
+            window.location.href = 'login.html';
+        }
+        
+        // Tab switching functionality
+        function showTab(tabName) {
+            // Hide all tab contents
+            const tabContents = document.getElementsByClassName('tab-content');
+            for (let i = 0; i < tabContents.length; i++) {
+                tabContents[i].classList.remove('active');
+            }
+            
+            // Remove active class from all tabs
+            const tabs = document.getElementsByClassName('tab');
+            for (let i = 0; i < tabs.length; i++) {
+                tabs[i].classList.remove('active');
+            }
+            
+            // Show the selected tab content
+            document.getElementById(tabName).classList.add('active');
+            
+            // Add active class to clicked tab
+            event.currentTarget.classList.add('active');
+            
+            // Load data based on the selected tab
+            switch(tabName) {
+                case 'overview':
+                    loadParentDashboardData();
+                    break;
+                case 'performance':
+                    loadPerformanceData();
+                    break;
+                case 'fees':
+                    loadFeesData();
+                    break;
+            }
+        }
+    </script>
+</body>
+</html>

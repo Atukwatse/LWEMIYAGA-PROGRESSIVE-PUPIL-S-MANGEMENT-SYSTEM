@@ -1,0 +1,1393 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - Lwemiyaga Pupils Management System</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1, h2 {
+            color: #2c3e50;
+        }
+        .user-info {
+            text-align: right;
+            margin-bottom: 10px;
+            color: #2c3e50;
+        }
+        .logout-btn {
+            background-color: #dc3545;
+            padding: 5px 10px;
+            font-size: 14px;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        .logout-btn:hover {
+            background-color: #c82333;
+        }
+        .tabs {
+            display: flex;
+            margin-bottom: 20px;
+            border-bottom: 1px solid #ddd;
+        }
+        .tab {
+            padding: 10px 20px;
+            cursor: pointer;
+            background-color: #eee;
+            border: 1px solid #ddd;
+            border-bottom: none;
+            border-radius: 5px 5px 0 0;
+            margin-right: 5px;
+        }
+        .tab.active {
+            background-color: #007bff;
+            color: white;
+        }
+        .tab-content {
+            display: none;
+        }
+        .tab-content.active {
+            display: block;
+        }
+        form {
+            background-color: #f9f9f9;
+            padding: 20px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+        input, select, textarea {
+            width: 100%;
+            padding: 8px;
+            margin: 8px 0;
+            box-sizing: border-box;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        button {
+            background-color: #007bff;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 12px;
+            text-align: left;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+        .success {
+            color: green;
+            margin: 10px 0;
+        }
+        .error {
+            color: red;
+            margin: 10px 0;
+        }
+        .dashboard-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        .stat-card {
+            background-color: #e9f7fe;
+            padding: 20px;
+            border-radius: 5px;
+            text-align: center;
+        }
+        .stat-number {
+            font-size: 2em;
+            font-weight: bold;
+            color: #007bff;
+        }
+        .message-history {
+            max-height: 300px;
+            overflow-y: auto;
+            border: 1px solid #ddd;
+            padding: 10px;
+            margin-top: 10px;
+            border-radius: 4px;
+        }
+        .message-item {
+            padding: 10px;
+            border-bottom: 1px solid #eee;
+        }
+        .message-item:last-child {
+            border-bottom: none;
+        }
+        .message-sender {
+            font-weight: bold;
+            color: #007bff;
+        }
+        .message-date {
+            font-size: 0.8em;
+            color: #777;
+        }
+        .message-content {
+            margin-top: 5px;
+        }
+        .detail-view {
+            background-color: #f8f9fa;
+            padding: 20px;
+            border-radius: 5px;
+            margin-top: 20px;
+            display: none;
+        }
+        .detail-view h3 {
+            margin-top: 0;
+            color: #2c3e50;
+        }
+        .detail-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        .detail-item {
+            background-color: white;
+            padding: 15px;
+            border-radius: 4px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+        .detail-label {
+            font-weight: bold;
+            color: #495057;
+        }
+        .detail-value {
+            margin-top: 5px;
+            color: #212529;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="user-info">
+            Logged in as: <span id="currentUser">Administrator</span>
+            <button class="logout-btn" onclick="logout()">Logout</button>
+        </div>
+        
+        <h1>Administrator Dashboard</h1>
+        
+        <div class="tabs">
+            <div class="tab active" onclick="showTab('overview')">Overview</div>
+            <div class="tab" onclick="showTab('students')">Students</div>
+            <div class="tab" onclick="showTab('teachers')">Teachers</div>
+            <div class="tab" onclick="showTab('classes')">Classes</div>
+            <div class="tab" onclick="showTab('fees')">Fees</div>
+            <div class="tab" onclick="showTab('messages')">Messages</div>
+        </div>
+        
+        <!-- Overview Tab -->
+        <div id="overview" class="tab-content active">
+            <h2>School Overview</h2>
+            
+            <div class="dashboard-stats">
+                <div class="stat-card">
+                    <div class="stat-number" id="totalStudents">0</div>
+                    <div>Total Students</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="totalTeachers">0</div>
+                    <div>Total Teachers</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="totalClasses">0</div>
+                    <div>Total Classes</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="pendingFees">0</div>
+                    <div>Students with Pending Fees</div>
+                </div>
+            </div>
+            
+            <h3>Class Overview</h3>
+            <table id="classesTable">
+                <thead>
+                    <tr>
+                        <th>Class</th>
+<th>Number of Students</th>
+                        <th>Average Performance</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- Class data will be loaded here -->
+                </tbody>
+            </table>
+        </div>
+        
+        <!-- Students Tab -->
+        <div id="students" class="tab-content">
+            <h2>Student Management</h2>
+            
+            <table id="studentsTable">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Name</th>
+<th>Class</th>
+                        <th>Parent</th>
+                        <th>Contact</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- Student data will be loaded here -->
+                </tbody>
+            </table>
+            
+            <!-- Student Detail View -->
+            <div id="studentDetailView" class="detail-view">
+                <h3>Student Details</h3>
+                <div class="detail-grid">
+                    <div class="detail-item">
+                        <div class="detail-label">Student ID</div>
+                        <div id="detailStudentId" class="detail-value"></div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-label">Name</div>
+                        <div id="detailStudentName" class="detail-value"></div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-label">Date of Birth</div>
+                        <div id="detailStudentDob" class="detail-value"></div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-label">Gender</div>
+                        <div id="detailStudentGender" class="detail-value"></div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-label">Class</div>
+                        <div id="detailStudentClass" class="detail-value"></div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-label">Address</div>
+                        <div id="detailStudentAddress" class="detail-value"></div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-label">Parent Name</div>
+                        <div id="detailParentName" class="detail-value"></div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-label">Parent Contact</div>
+                        <div id="detailParentContact" class="detail-value"></div>
+                    </div>
+                </div>
+                <button onclick="closeDetailView('studentDetailView')">Close</button>
+            </div>
+        </div>
+        
+        <!-- Teachers Tab -->
+        <div id="teachers" class="tab-content">
+            <h2>Teacher Management</h2>
+            
+            <form id="addTeacherForm">
+                <h3>Add New Teacher</h3>
+                <div id="teacherResult"></div>
+                
+                <label for="teacherFirstName">First Name:</label>
+                <input type="text" id="teacherFirstName" required>
+                
+                <label for="teacherLastName">Last Name:</label>
+                <input type="text" id="teacherLastName" required>
+                
+                <label for="teacherEmail">Email:</label>
+                <input type="email" id="teacherEmail" required>
+                
+                <label for="teacherPassword">Password:</label>
+                <input type="password" id="teacherPassword" required>
+                
+                <label for="teacherSubject">Subject:</label>
+                <select id="teacherSubject" required>
+                    <option value="">Select Subject</option>
+                    <option value="Mathematics">Mathematics</option>
+                    <option value="English">English</option>
+                    <option value="Science">Science</option>
+                    <option value="Social Studies">Social Studies</option>
+                    <option value="Creative Arts">Creative Arts</option>
+                </select>
+                
+                <label for="teacherClass">Class Assigned:</label>
+                <select id="teacherClass" required>
+                    <option value="">Select Class</option>
+                    <option value="Baby Class">Baby Class</option>
+                    <option value="Middle Class">Middle Class</option>
+                    <option value="Top Class">Top Class</option>
+                    <option value="P.1">P.1</option>
+                    <option value="P.2">P.2</option>
+                    <option value="P.3">P.3</option>
+                    <option value="P.4">P.4</option>
+                    <option value="P.5">P.5</option>
+                    <option value="P.6">P.6</option>
+                    <option value="P.7">P.7</option>
+                </select>
+                
+                <button type="submit">Add Teacher</button>
+            </form>
+            
+            <table id="teachersTable">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Name</th>
+                        <th>Email</th>
+                        <th>Subject</th>
+                        <th>Class Assigned</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- Teacher data will be loaded here -->
+                </tbody>
+            </table>
+            
+            <!-- Teacher Detail View -->
+            <div id="teacherDetailView" class="detail-view">
+                <h3>Teacher Details</h3>
+                <div class="detail-grid">
+                    <div class="detail-item">
+                        <div class="detail-label">Teacher ID</div>
+                        <div id="detailTeacherId" class="detail-value"></div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-label">Name</div>
+                        <div id="detailTeacherName" class="detail-value"></div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-label">Email</div>
+                        <div id="detailTeacherEmail" class="detail-value"></div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-label">Subject</div>
+                        <div id="detailTeacherSubject" class="detail-value"></div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-label">Class Assigned</div>
+                        <div id="detailTeacherClass" class="detail-value"></div>
+                    </div>
+                </div>
+                <button onclick="editTeacher()">Edit</button>
+                <button onclick="closeDetailView('teacherDetailView')">Close</button>
+            </div>
+            
+            <!-- Edit Teacher Form -->
+            <div id="editTeacherForm" class="detail-view" style="display: none;">
+                <h3>Edit Teacher Details</h3>
+                <form id="teacherEditForm">
+                    <input type="hidden" id="editTeacherId">
+                    <div class="detail-grid">
+                        <div class="detail-item">
+                            <div class="detail-label">First Name:</div>
+                            <input type="text" id="editTeacherFirstName" required>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-label">Last Name:</div>
+                            <input type="text" id="editTeacherLastName" required>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-label">Email:</div>
+                            <input type="email" id="editTeacherEmail" required>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-label">Subject:</div>
+                            <select id="editTeacherSubject" required>
+                                <option value="">Select Subject</option>
+                                <option value="Mathematics">Mathematics</option>
+                                <option value="English">English</option>
+                                <option value="Science">Science</option>
+                                <option value="Social Studies">Social Studies</option>
+                                <option value="Creative Arts">Creative Arts</option>
+                            </select>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-label">Class Assigned:</div>
+                            <select id="editTeacherClass" required>
+                                <option value="">Select Class</option>
+                                <option value="Baby Class">Baby Class</option>
+                                <option value="Middle Class">Middle Class</option>
+                                <option value="Top Class">Top Class</option>
+                                <option value="P.1">P.1</option>
+                                <option value="P.2">P.2</option>
+                                <option value="P.3">P.3</option>
+                                <option value="P.4">P.4</option>
+                                <option value="P.5">P.5</option>
+                                <option value="P.6">P.6</option>
+                                <option value="P.7">P.7</option>
+                            </select>
+                        </div>
+                    </div>
+                    <button type="submit">Save Changes</button>
+                    <button type="button" onclick="cancelEditTeacher()">Cancel</button>
+                </form>
+            </div>
+        </div>
+        
+        <!-- Classes Tab -->
+        <div id="classes" class="tab-content">
+            <h2>Class Management</h2>
+            
+            <form id="assignTeacherForm">
+                <h3>Assign Class Teacher</h3>
+                <div id="assignTeacherResult"></div>
+                
+                <label for="classToAssign">Select Class:</label>
+                <select id="classToAssign" required>
+                    <option value="">Select Class</option>
+                    <option value="Baby Class">Baby Class</option>
+                    <option value="Middle Class">Middle Class</option>
+                    <option value="Top Class">Top Class</option>
+                    <option value="P.1">P.1</option>
+                    <option value="P.2">P.2</option>
+                    <option value="P.3">P.3</option>
+                    <option value="P.4">P.4</option>
+                    <option value="P.5">P.5</option>
+                    <option value="P.6">P.6</option>
+                    <option value="P.7">P.7</option>
+                </select>
+                
+                <label for="teacherToAssign">Select Teacher:</label>
+                <select id="teacherToAssign" required>
+                    <option value="">Select Teacher</option>
+                    <!-- Teachers will be loaded dynamically -->
+                </select>
+                
+                <button type="submit">Assign Teacher</button>
+            </form>
+            
+            <table id="allClassesTable">
+                <thead>
+                    <tr>
+                        <th>Class</th>
+                        <th>Number of Students</th>
+                        <th>Class Teacher</th>
+                        <th>Average Performance</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- Class data will be loaded here -->
+                </tbody>
+            </table>
+            
+            <!-- Class Detail View -->
+            <div id="classDetailView" class="detail-view">
+                <h3>Class Details</h3>
+                <div class="detail-grid">
+                    <div class="detail-item">
+                        <div class="detail-label">Class Name</div>
+                        <div id="detailClassName" class="detail-value"></div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-label">Number of Students</div>
+                        <div id="detailClassStudents" class="detail-value"></div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-label">Class Teacher</div>
+                        <div id="detailClassTeacher" class="detail-value"></div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-label">Average Performance</div>
+                        <div id="detailClassPerformance" class="detail-value"></div>
+                    </div>
+                </div>
+                <button onclick="closeDetailView('classDetailView')">Close</button>
+            </div>
+        </div>
+        
+        <!-- Fees Tab -->
+        <div id="fees" class="tab-content">
+            <h2>Fees Management</h2>
+            
+            <table id="feesTable">
+                <thead>
+                    <tr>
+                        <th>Student Name</th>
+                        <th>Class</th>
+                        <th>Total Amount</th>
+                        <th>Amount Paid</th>
+                        <th>Balance</th>
+                        <th>Last Payment</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- Fees data will be loaded here -->
+                </tbody>
+            </table>
+            
+            <!-- Fee Detail View -->
+            <div id="feeDetailView" class="detail-view">
+                <h3>Fee Details</h3>
+                <div class="detail-grid">
+                    <div class="detail-item">
+                        <div class="detail-label">Student Name</div>
+                        <div id="detailFeeStudentName" class="detail-value"></div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-label">Class</div>
+                        <div id="detailFeeClass" class="detail-value"></div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-label">Total Amount</div>
+                        <div id="detailFeeTotal" class="detail-value"></div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-label">Amount Paid</div>
+                        <div id="detailFeePaid" class="detail-value"></div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-label">Balance</div>
+                        <div id="detailFeeBalance" class="detail-value"></div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-label">Last Payment Date</div>
+                        <div id="detailFeeLastPayment" class="detail-value"></div>
+                    </div>
+                </div>
+                <button onclick="closeDetailView('feeDetailView')">Close</button>
+            </div>
+        </div>
+        
+        <!-- Messages Tab -->
+        <div id="messages" class="tab-content">
+            <h2>Send Message to Teachers</h2>
+            
+            <form id="messageForm">
+                <div id="messageResult"></div>
+                
+                <label for="teacherSelect">Select Teacher:</label>
+                <select id="teacherSelect" required>
+                    <option value="">Select Teacher</option>
+                    <!-- Options will be populated dynamically -->
+                </select>
+                
+                <label for="messageSubject">Subject:</label>
+                <input type="text" id="messageSubject" placeholder="Enter message subject" required>
+                
+                <label for="messageContent">Message:</label>
+                <textarea id="messageContent" rows="5" placeholder="Enter your message to the teacher" required></textarea>
+                
+                <button type="submit">Send Message</button>
+            </form>
+            
+            <h3>Message History</h3>
+            <div class="message-history" id="messageHistory">
+                <!-- Messages will be loaded here -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Base URL for API calls
+        const BASE_URL = '';
+        
+        // Store messages in memory for demo purposes
+        let messageHistory = [];
+        
+        // Check if user is logged in
+        window.onload = function() {
+            const userRole = localStorage.getItem('userRole');
+            if (!userRole || userRole !== 'admin') {
+                // Redirect to login page if not logged in as admin
+                window.location.href = 'login.html';
+                return;
+            }
+            
+            // Display current user
+            document.getElementById('currentUser').textContent = 
+                localStorage.getItem('username') + ' (' + userRole + ')';
+            
+            // Load dashboard data
+            loadAdminDashboardData();
+        };
+        
+        // Logout function
+        function logout() {
+            localStorage.removeItem('userRole');
+            localStorage.removeItem('userId');
+            localStorage.removeItem('username');
+            window.location.href = 'login.html';
+        }
+        
+        // Load admin dashboard data
+        function loadAdminDashboardData() {
+            // Fetch real data from the server
+            Promise.all([
+                fetch(BASE_URL + '/api/students'),
+                fetch(BASE_URL + '/api/teachers'),
+                fetch(BASE_URL + '/api/classes')
+            ])
+            .then(responses => Promise.all(responses.map(res => res.json())))
+            .then(([students, teachers, classes]) => {
+                // Set statistics
+                document.getElementById('totalStudents').textContent = students.length;
+                document.getElementById('totalTeachers').textContent = teachers.length;
+                document.getElementById('totalClasses').textContent = classes.length;
+                
+                // For pending fees, we'll need to fetch fees data
+                fetch(BASE_URL + '/api/fees/all')
+                    .then(response => response.json())
+                    .then(fees => {
+                        if (!fees.error) {
+                            const pendingFees = fees.filter(fee => fee.balance > 0).length;
+                            document.getElementById('pendingFees').textContent = pendingFees;
+                        } else {
+                            document.getElementById('pendingFees').textContent = '0';
+                        }
+                        
+                        // Load class overview
+                        const tbody = document.querySelector('#classesTable tbody');
+                        tbody.innerHTML = '';
+                        
+                        classes.forEach(cls => {
+                            const row = document.createElement('tr');
+                            row.innerHTML = `
+                                <td>${cls.class}</td>
+                                <td>${cls.studentCount}</td>
+                                <td>N/A</td>
+                            `;
+                            tbody.appendChild(row);
+                        });
+                    })
+                    .catch(error => {
+                        console.error('Error loading fees data:', error);
+                        document.getElementById('pendingFees').textContent = '0';
+                        
+                        // Load class overview
+                        const tbody = document.querySelector('#classesTable tbody');
+                        tbody.innerHTML = '';
+                        
+                        classes.forEach(cls => {
+                            const row = document.createElement('tr');
+                            row.innerHTML = `
+                                <td>${cls.class}</td>
+                                <td>${cls.studentCount}</td>
+                                <td>N/A</td>
+                            `;
+                            tbody.appendChild(row);
+                        });
+                    });
+            })
+            .catch(error => {
+                console.error('Error loading dashboard data:', error);
+                // Use sample data as fallback
+                document.getElementById('totalStudents').textContent = '120';
+                document.getElementById('totalTeachers').textContent = '8';
+                document.getElementById('totalClasses').textContent = '10';
+                document.getElementById('pendingFees').textContent = '15';
+                
+                // Load sample class overview
+                const classData = [
+                    { class: 'Baby Class', studentCount: 25, averagePerformance: 'N/A' },
+                    { class: 'Middle Class', studentCount: 20, averagePerformance: 'N/A' },
+                    { class: 'Top Class', studentCount: 18, averagePerformance: 'N/A' },
+                    { class: 'P.1', studentCount: 15, averagePerformance: '78%' },
+                    { class: 'P.2', studentCount: 14, averagePerformance: '82%' },
+                    { class: 'P.3', studentCount: 13, averagePerformance: '75%' },
+                    { class: 'P.4', studentCount: 10, averagePerformance: '85%' },
+                    { class: 'P.5', studentCount: 8, averagePerformance: '80%' },
+                    { class: 'P.6', studentCount: 7, averagePerformance: '88%' },
+                    { class: 'P.7', studentCount: 10, averagePerformance: '83%' }
+                ];
+                
+                const tbody = document.querySelector('#classesTable tbody');
+                tbody.innerHTML = '';
+                
+                classData.forEach(cls => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>${cls.class}</td>
+                        <td>${cls.studentCount}</td>
+                        <td>${cls.averagePerformance}</td>
+                    `;
+                    tbody.appendChild(row);
+                });
+            });
+        }
+        
+        // Tab switching functionality
+        function showTab(tabName) {
+            // Hide all tab contents
+            const tabContents = document.getElementsByClassName('tab-content');
+            for (let i = 0; i < tabContents.length; i++) {
+                tabContents[i].classList.remove('active');
+            }
+            
+            // Remove active class from all tabs
+            const tabs = document.getElementsByClassName('tab');
+            for (let i = 0; i < tabs.length; i++) {
+                tabs[i].classList.remove('active');
+            }
+            
+            // Show the selected tab content
+            document.getElementById(tabName).classList.add('active');
+            
+            // Add active class to clicked tab
+            event.currentTarget.classList.add('active');
+            
+            // Load data based on the selected tab
+            switch(tabName) {
+                case 'overview':
+                    loadAdminDashboardData();
+                    break;
+                case 'students':
+                    loadStudentsData();
+                    break;
+                case 'teachers':
+                    loadTeachersData();
+                    break;
+                case 'classes':
+                    loadClassesData();
+                    loadTeachersForAssignment();
+                    break;
+                case 'fees':
+                    loadFeesData();
+                    break;
+                case 'messages':
+                    loadTeachersForMessaging();
+                    loadMessageHistory();
+                    break;
+            }
+        }
+        
+        // Close detail view
+        function closeDetailView(viewId) {
+            document.getElementById(viewId).style.display = 'none';
+        }
+        
+        // Show student detail view
+        function viewStudent(studentId) {
+            fetch(BASE_URL + '/api/students/' + studentId)
+                .then(response => response.json())
+                .then(student => {
+                    if (student.error) {
+                        console.error('Error fetching student:', student.error);
+                        return;
+                    }
+                    
+                    // Populate detail view
+                    document.getElementById('detailStudentId').textContent = student.id;
+                    document.getElementById('detailStudentName').textContent = student.firstName + ' ' + student.lastName;
+                    document.getElementById('detailStudentDob').textContent = student.dateOfBirth;
+                    document.getElementById('detailStudentGender').textContent = student.gender;
+                    document.getElementById('detailStudentClass').textContent = student.class;
+                    document.getElementById('detailStudentAddress').textContent = student.address;
+                    document.getElementById('detailParentName').textContent = student.parentName;
+                    document.getElementById('detailParentContact').textContent = student.parentContact;
+                    
+                    // Show detail view
+                    document.getElementById('studentDetailView').style.display = 'block';
+                })
+                .catch(error => {
+                    console.error('Error loading student details:', error);
+                });
+        }
+        
+        // Show teacher detail view
+        function viewTeacher(teacherId) {
+            fetch(BASE_URL + '/api/teachers/' + teacherId)
+                .then(response => response.json())
+                .then(teacher => {
+                    if (teacher.error) {
+                        console.error('Error fetching teacher:', teacher.error);
+                        return;
+                    }
+                    
+                    // Populate detail view
+                    document.getElementById('detailTeacherId').textContent = teacher.id;
+                    document.getElementById('detailTeacherName').textContent = teacher.firstName + ' ' + teacher.lastName;
+                    document.getElementById('detailTeacherEmail').textContent = teacher.email;
+                    document.getElementById('detailTeacherSubject').textContent = teacher.subject;
+                    document.getElementById('detailTeacherClass').textContent = teacher.classAssigned;
+                    
+                    // Show detail view
+                    document.getElementById('teacherDetailView').style.display = 'block';
+                })
+                .catch(error => {
+                    console.error('Error loading teacher details:', error);
+                });
+        }
+        
+        // Load students data
+        function loadStudentsData() {
+            fetch(BASE_URL + '/api/students')
+                .then(response => response.json())
+                .then(data => {
+                    const tbody = document.querySelector('#studentsTable tbody');
+                    tbody.innerHTML = '';
+                    
+                    if (data.error) {
+                        tbody.innerHTML = `<tr><td colspan="6">Error loading students: ${data.error}</td></tr>`;
+                        return;
+                    }
+                    
+                    data.forEach(student => {
+                        const row = document.createElement('tr');
+                        row.innerHTML = `
+                            <td>${student.id}</td>
+                            <td>${student.firstName} ${student.lastName}</td>
+                            <td>${student.class}</td>
+                            <td>${student.parentName}</td>
+                            <td>${student.parentContact}</td>
+                            <td>
+                                <button onclick="viewStudent(${student.id})">View</button>
+                            </td>
+                        `;
+                        tbody.appendChild(row);
+                    });
+                })
+                .catch(error => {
+                    const tbody = document.querySelector('#studentsTable tbody');
+                    tbody.innerHTML = `<tr><td colspan="6">Error loading students: ${error.message}</td></tr>`;
+                });
+        }
+        
+        // Load teachers data from server
+        function loadTeachersData() {
+            fetch(BASE_URL + '/api/teachers')
+                .then(response => response.json())
+                .then(data => {
+                    const tbody = document.querySelector('#teachersTable tbody');
+                    tbody.innerHTML = '';
+                    
+                    if (data.error) {
+                        tbody.innerHTML = `<tr><td colspan="6">Error loading teachers: ${data.error}</td></tr>`;
+                        return;
+                    }
+                    
+                    data.forEach(teacher => {
+                        const row = document.createElement('tr');
+                        row.innerHTML = `
+                            <td>${teacher.id}</td>
+                            <td>${teacher.firstName} ${teacher.lastName}</td>
+                            <td>${teacher.email}</td>
+                            <td>${teacher.subject}</td>
+                            <td>${teacher.classAssigned}</td>
+                            <td>
+                                <button onclick="viewTeacher(${teacher.id})">View</button>
+                                <button onclick="deleteTeacher(${teacher.id})" style="background-color: #dc3545; margin-left: 5px;">Delete</button>
+                            </td>
+                        `;
+                        tbody.appendChild(row);
+                    });
+                })
+                .catch(error => {
+                    const tbody = document.querySelector('#teachersTable tbody');
+                    tbody.innerHTML = `<tr><td colspan="6">Error loading teachers: ${error.message}</td></tr>`;
+                });
+        }
+        
+        // Edit teacher function
+        function editTeacher() {
+            // Get current teacher details
+            const teacherId = document.getElementById('detailTeacherId').textContent;
+            const teacherName = document.getElementById('detailTeacherName').textContent;
+            const teacherEmail = document.getElementById('detailTeacherEmail').textContent;
+            const teacherSubject = document.getElementById('detailTeacherSubject').textContent;
+            const teacherClass = document.getElementById('detailTeacherClass').textContent;
+            
+            // Split name into first and last
+            const nameParts = teacherName.split(' ');
+            const firstName = nameParts[0];
+            const lastName = nameParts.length > 1 ? nameParts.slice(1).join(' ') : '';
+            
+            // Populate edit form
+            document.getElementById('editTeacherId').value = teacherId;
+            document.getElementById('editTeacherFirstName').value = firstName;
+            document.getElementById('editTeacherLastName').value = lastName;
+            document.getElementById('editTeacherEmail').value = teacherEmail;
+            document.getElementById('editTeacherSubject').value = teacherSubject;
+            document.getElementById('editTeacherClass').value = teacherClass;
+            
+            // Hide detail view and show edit form
+            document.getElementById('teacherDetailView').style.display = 'none';
+            document.getElementById('editTeacherForm').style.display = 'block';
+        }
+        
+        // Cancel edit teacher
+        function cancelEditTeacher() {
+            document.getElementById('editTeacherForm').style.display = 'none';
+            document.getElementById('teacherDetailView').style.display = 'block';
+        }
+        
+        // Handle teacher edit form submission
+        document.getElementById('teacherEditForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const teacherId = document.getElementById('editTeacherId').value;
+            const teacherData = {
+                firstName: document.getElementById('editTeacherFirstName').value,
+                lastName: document.getElementById('editTeacherLastName').value,
+                email: document.getElementById('editTeacherEmail').value,
+                subject: document.getElementById('editTeacherSubject').value,
+                classAssigned: document.getElementById('editTeacherClass').value
+            };
+            
+            // Send update request to server
+            fetch(BASE_URL + '/api/teachers/' + teacherId, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(teacherData)
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.error) {
+                    alert('Error updating teacher: ' + data.error);
+                } else {
+                    alert('Teacher updated successfully!');
+                    // Hide edit form
+                    document.getElementById('editTeacherForm').style.display = 'none';
+                    // Reload teachers data
+                    loadTeachersData();
+                }
+            })
+            .catch(error => {
+                alert('Error updating teacher: ' + error.message);
+            });
+        });
+
+        // Delete teacher
+        function deleteTeacher(teacherId) {
+            if (confirm('Are you sure you want to delete this teacher? This action cannot be undone.')) {
+                fetch(BASE_URL + '/api/teachers/' + teacherId, {
+                    method: 'DELETE'
+                })
+                .then(response => {
+                    // Check if the response is OK (status 200-299)
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    if (data.error) {
+                        alert('Error deleting teacher: ' + data.error);
+                    } else {
+                        alert('Teacher deleted successfully!');
+                        // Reload teachers data
+                        loadTeachersData();
+                        // Reload dashboard data to update counts
+                        loadAdminDashboardData();
+                    }
+                })
+                .catch(error => {
+                    // Handle network errors or other issues
+                    console.error('Error deleting teacher:', error);
+                    alert('Error deleting teacher: ' + error.message);
+                });
+            }
+        }
+        
+        // Load classes data
+        function loadClassesData() {
+            // Fetch real data from the server
+            Promise.all([
+                fetch(BASE_URL + '/api/classes'),
+                fetch(BASE_URL + '/api/teachers')
+            ])
+            .then(responses => Promise.all(responses.map(res => res.json())))
+            .then(([classes, teachers]) => {
+                const tbody = document.querySelector('#allClassesTable tbody');
+                tbody.innerHTML = '';
+                
+                if (classes.error || teachers.error) {
+                    tbody.innerHTML = `<tr><td colspan="5">Error loading classes data</td></tr>`;
+                    return;
+                }
+                
+                // Create a map of teachers by their assigned class for quick lookup
+                const teacherMap = {};
+                teachers.forEach(teacher => {
+                    if (teacher.classAssigned) {
+                        teacherMap[teacher.classAssigned] = `${teacher.firstName} ${teacher.lastName}`;
+                    }
+                });
+                
+                classes.forEach(cls => {
+                    const classTeacher = teacherMap[cls.class] || 'Pending';
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>${cls.class}</td>
+                        <td>${cls.studentCount}</td>
+                        <td>${classTeacher}</td>
+                        <td>N/A</td>
+                        <td>
+                            <button onclick="viewClass('${cls.class}')">View</button>
+                        </td>
+                    `;
+                    tbody.appendChild(row);
+                });
+            })
+            .catch(error => {
+                console.error('Error loading classes data:', error);
+                // Fallback to sample data
+                const classData = [
+                    { class: 'Baby Class', studentCount: 25, classTeacher: 'Pending', averagePerformance: 'N/A' },
+                    { class: 'Middle Class', studentCount: 20, classTeacher: 'Pending', averagePerformance: 'N/A' },
+                    { class: 'Top Class', studentCount: 18, classTeacher: 'Pending', averagePerformance: 'N/A' },
+                    { class: 'P.1', studentCount: 15, classTeacher: 'James Anderson', averagePerformance: '78%' },
+                    { class: 'P.2', studentCount: 14, classTeacher: 'Michael Brown', averagePerformance: '82%' },
+                    { class: 'P.3', studentCount: 13, classTeacher: 'Robert Wilson', averagePerformance: '75%' },
+                    { class: 'P.4', studentCount: 10, classTeacher: 'Pending', averagePerformance: '85%' },
+                    { class: 'P.5', studentCount: 8, classTeacher: 'Pending', averagePerformance: '80%' },
+                    { class: 'P.6', studentCount: 7, classTeacher: 'Pending', averagePerformance: '88%' },
+                    { class: 'P.7', studentCount: 10, classTeacher: 'Pending', averagePerformance: '83%' }
+                ];
+                
+                const tbody = document.querySelector('#allClassesTable tbody');
+                tbody.innerHTML = '';
+                
+                classData.forEach(cls => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>${cls.class}</td>
+                        <td>${cls.studentCount}</td>
+                        <td>${cls.classTeacher}</td>
+                        <td>${cls.averagePerformance}</td>
+                        <td>
+                            <button onclick="viewClass('${cls.class}')">View</button>
+                        </td>
+                    `;
+                    tbody.appendChild(row);
+                });
+            });
+        }
+        
+        // Load fees data
+        function loadFeesData() {
+            // Fetch real data from the server
+            fetch(BASE_URL + '/api/fees/all')
+                .then(response => response.json())
+                .then(data => {
+                    const tbody = document.querySelector('#feesTable tbody');
+                    tbody.innerHTML = '';
+                    
+                    if (data.error) {
+                        tbody.innerHTML = `<tr><td colspan="7">Error loading fees data: ${data.error}</td></tr>`;
+                        return;
+                    }
+                    
+                    data.forEach(fee => {
+                        const row = document.createElement('tr');
+                        row.innerHTML = `
+                            <td>${fee.firstName} ${fee.lastName}</td>
+                            <td>${fee.class}</td>
+                            <td>UGX ${fee.totalAmount.toLocaleString()}</td>
+                            <td>UGX ${fee.amountPaid.toLocaleString()}</td>
+                            <td>UGX ${fee.balance.toLocaleString()}</td>
+                            <td>${fee.paymentDate ? new Date(fee.paymentDate).toLocaleDateString() : 'N/A'}</td>
+                            <td>
+                                <button onclick="viewFee('${fee.firstName} ${fee.lastName}', '${fee.class}')">View</button>
+                            </td>
+                        `;
+                        tbody.appendChild(row);
+                    });
+                })
+                .catch(error => {
+                    const tbody = document.querySelector('#feesTable tbody');
+                    tbody.innerHTML = `<tr><td colspan="7">Error loading fees data: ${error.message}</td></tr>`;
+                });
+        }
+        
+        // Load teachers for messaging
+        function loadTeachersForMessaging() {
+            fetch(BASE_URL + '/api/teachers')
+                .then(response => response.json())
+                .then(data => {
+                    const select = document.getElementById('teacherSelect');
+                    select.innerHTML = '<option value="">Select Teacher</option>';
+                    
+                    if (data.error) {
+                        return;
+                    }
+                    
+                    data.forEach(teacher => {
+                        const option = document.createElement('option');
+                        option.value = teacher.id;
+                        option.textContent = `${teacher.firstName} ${teacher.lastName} (${teacher.email})`;
+                        select.appendChild(option);
+                    });
+                })
+                .catch(error => {
+                    console.error('Error loading teachers for messaging:', error);
+                });
+        }
+        
+        // Load teachers for assignment dropdown
+        function loadTeachersForAssignment() {
+            fetch(BASE_URL + '/api/teachers')
+                .then(response => response.json())
+                .then(data => {
+                    const select = document.getElementById('teacherToAssign');
+                    select.innerHTML = '<option value="">Select Teacher</option>';
+                    
+                    if (data.error) {
+                        return;
+                    }
+                    
+                    data.forEach(teacher => {
+                        const option = document.createElement('option');
+                        option.value = teacher.id;
+                        option.textContent = `${teacher.firstName} ${teacher.lastName}`;
+                        select.appendChild(option);
+                    });
+                })
+                .catch(error => {
+                    console.error('Error loading teachers for assignment:', error);
+                });
+        }
+        
+        // Add teacher form submission
+        document.getElementById('addTeacherForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const teacherData = {
+                firstName: document.getElementById('teacherFirstName').value,
+                lastName: document.getElementById('teacherLastName').value,
+                email: document.getElementById('teacherEmail').value,
+                password: document.getElementById('teacherPassword').value,
+                subject: document.getElementById('teacherSubject').value,
+                classAssigned: document.getElementById('teacherClass').value
+            };
+            
+            // Send request to server
+            fetch(BASE_URL + '/api/teachers/add', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(teacherData)
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.error) {
+                    document.getElementById('teacherResult').innerHTML = 
+                        '<div class="error">Error: ' + data.error + '</div>';
+                } else {
+                    // Show success message
+                    document.getElementById('teacherResult').innerHTML = 
+                        '<div class="success">Teacher added successfully!</div>';
+                    
+                    // Reset form
+                    document.getElementById('addTeacherForm').reset();
+                    
+                    // Reload teachers data to show the new teacher
+                    loadTeachersData();
+                }
+                
+                // Clear the message after 3 seconds
+                setTimeout(() => {
+                    document.getElementById('teacherResult').innerHTML = '';
+                }, 3000);
+            })
+            .catch(error => {
+                document.getElementById('teacherResult').innerHTML = 
+                    '<div class="error">Error adding teacher: ' + error.message + '</div>';
+                
+                // Clear the message after 3 seconds
+                setTimeout(() => {
+                    document.getElementById('teacherResult').innerHTML = '';
+                }, 3000);
+            });
+        });
+        
+        // Load message history
+        function loadMessageHistory() {
+            // Display messages from memory
+            const container = document.getElementById('messageHistory');
+            container.innerHTML = '';
+            
+            if (messageHistory.length === 0) {
+                container.innerHTML = '<p>No messages sent yet.</p>';
+                return;
+            }
+            
+            // Display messages in reverse order (newest first)
+            messageHistory.slice().reverse().forEach(msg => {
+                const messageDiv = document.createElement('div');
+                messageDiv.className = 'message-item';
+                messageDiv.innerHTML = `
+                    <div>
+                        <span class="message-sender">To: ${msg.recipient}</span>
+                        <span class="message-date">(${msg.date})</span>
+                    </div>
+                    <div class="message-content">
+                        <strong>${msg.subject}</strong><br>
+                        ${msg.content}
+                    </div>
+                `;
+                container.appendChild(messageDiv);
+            });
+        }
+        
+        // Assign teacher form submission
+        document.getElementById('assignTeacherForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const classToAssign = document.getElementById('classToAssign').value;
+            const teacherToAssign = document.getElementById('teacherToAssign').value;
+            const teacherName = document.getElementById('teacherToAssign').selectedOptions[0].text;
+            
+            if (!classToAssign || !teacherToAssign) {
+                document.getElementById('assignTeacherResult').innerHTML = 
+                    '<div class="error">Please select both a class and a teacher.</div>';
+                return;
+            }
+            
+            // Update teacher's assigned class
+            const teacherData = {
+                classAssigned: classToAssign
+            };
+            
+            fetch(BASE_URL + '/api/teachers/' + teacherToAssign, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(teacherData)
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.error) {
+                    document.getElementById('assignTeacherResult').innerHTML = 
+                        '<div class="error">Error: ' + data.error + '</div>';
+                } else {
+                    // Show success message
+                    document.getElementById('assignTeacherResult').innerHTML = 
+                        '<div class="success">Teacher assigned successfully!</div>';
+                    
+                    // Update the classes table to show the assigned teacher
+                    updateClassTeacher(classToAssign, teacherName);
+                    
+                    // Reset form
+                    document.getElementById('assignTeacherForm').reset();
+                    
+                    // Reload teachers data
+                    loadTeachersData();
+                }
+                
+                // Clear the message after 3 seconds
+                setTimeout(() => {
+                    document.getElementById('assignTeacherResult').innerHTML = '';
+                }, 3000);
+            })
+            .catch(error => {
+                document.getElementById('assignTeacherResult').innerHTML = 
+                    '<div class="error">Error assigning teacher: ' + error.message + '</div>';
+                
+                // Clear the message after 3 seconds
+                setTimeout(() => {
+                    document.getElementById('assignTeacherResult').innerHTML = '';
+                }, 3000);
+            });
+        });
+        
+        // Update class teacher in the table
+        function updateClassTeacher(className, teacherName) {
+            const tbody = document.querySelector('#allClassesTable tbody');
+            const rows = tbody.querySelectorAll('tr');
+            
+            rows.forEach(row => {
+                const classCell = row.cells[0];
+                if (classCell.textContent === className) {
+                    row.cells[2].textContent = teacherName;
+                }
+            });
+        }
+        
+        // Message form submission
+        document.getElementById('messageForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const teacherSelect = document.getElementById('teacherSelect');
+            const recipientName = teacherSelect.options[teacherSelect.selectedIndex].text;
+            const messageData = {
+                senderId: 1,
+                senderType: 'admin',
+                recipientId: teacherSelect.value,
+                recipient: recipientName,
+                subject: document.getElementById('messageSubject').value,
+                content: document.getElementById('messageContent').value,
+                date: new Date().toLocaleString()
+            };
+            
+            // Send message to server
+            fetch(BASE_URL + '/api/messages/send', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    senderId: messageData.senderId,
+                    senderType: messageData.senderType,
+                    recipientId: messageData.recipientId,
+                    subject: messageData.subject,
+                    content: messageData.content
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.error) {
+                    document.getElementById('messageResult').innerHTML = 
+                        '<div class="error">Error: ' + data.error + '</div>';
+                } else {
+                    // Add message to history
+                    messageHistory.push(messageData);
+                    
+                    // Show success message
+                    document.getElementById('messageResult').innerHTML = 
+                        '<div class="success">Message sent successfully!</div>';
+                    
+                    // Reset form
+                    document.getElementById('messageForm').reset();
+                    
+                    // Reload message history to show the new message
+                    loadMessageHistory();
+                }
+                
+                // Clear the success message after 3 seconds
+                setTimeout(() => {
+                    document.getElementById('messageResult').innerHTML = '';
+                }, 3000);
+            })
+            .catch(error => {
+                document.getElementById('messageResult').innerHTML = 
+                    '<div class="error">Error sending message: ' + error.message + '</div>';
+                
+                // Clear the message after 3 seconds
+                setTimeout(() => {
+                    document.getElementById('messageResult').innerHTML = '';
+                }, 3000);
+            });
+        });
+
+    </script>
+</body>
+</html>

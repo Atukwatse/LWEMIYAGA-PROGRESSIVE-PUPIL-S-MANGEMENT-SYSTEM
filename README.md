@@ -1,6 +1,6 @@
 # Lwemiyaga Progressive Pupils Management System
 
-A comprehensive student management system for primary schools with features for student registration, performance tracking, fees management, and administrative reporting.
+A comprehensive student management system for primary schools with features for student registration, performance trackings, fees management, and administrative reportings.
 
 ## Features
 

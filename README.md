@@ -12,7 +12,7 @@ A comprehensive student management system for primary schools with features for 
    - Record student performance by subject and term
    - Track grades and scores
 
-3. **Fees Management**
+3. Fees Management
    - Record school fees payments
    - Track balances owed by students
 

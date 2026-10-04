@@ -2,9 +2,9 @@
 
 A comprehensive student management system for primary schools with features for student registration, performance trackings, fees management, and administrative reportings.
 
-## Features
+Features
 
-1. **Student Registration**
+1. Student Registration**
    - Register new students with personal and parent information
    - Assign students to classes
 

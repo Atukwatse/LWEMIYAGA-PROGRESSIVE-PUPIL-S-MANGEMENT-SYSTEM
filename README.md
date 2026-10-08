@@ -8,7 +8,7 @@ Features
    - Register new students with personal and parent information
    - Assign students to classes
 
-2. **Performance Tracking**
+   2.**Performance Tracking**
    - Record student performance by subject and term
    - Track grades and scores
 
@@ -39,13 +39,13 @@ Features
 
 - Admin: username: `admin`, password: `admin123`
 
-## System Architecture
+##System Architecture
 
 - Backend: Node.js with Express framework
 - Database: SQLite (file-based, no separate installation required)
 - Frontend: HTML, CSS, JavaScript
 
-## API Endpoints
+##API Endpoints
 
 ### Student Management
 - POST `/api/students/register` - Register a new student

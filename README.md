@@ -35,7 +35,7 @@ Features
    ```
 5. Open your browser and navigate to `http://localhost:3000`
 
-## Default Login Credentials
+## Default Login Credentials.
 
 - Admin: username: `admin`, password: `admin123`
 
@@ -52,21 +52,21 @@ Features
 - GET `/api/students` - Get all students
 - GET `/api/students/:id` - Get a specific student
 
-### Performance Tracking
+### Performance Tracking.
 - POST `/api/performance/add` - Add student performance record
 - GET `/api/performance/student/:studentId` - Get performance records for a student
 
-### Fees Management
+### Fees Management.
 - POST `/api/fees/update` - Update student fees
 - GET `/api/fees/student/:studentId` - Get fees record for a student
 - GET `/api/fees/all` - Get all fees records
 
-### Class Management
+### Class Management.
 - GET `/api/classes` - Get all classes with student counts
 - GET `/api/classes/:className/students` - Get students in a specific class
 - GET `/api/classes/:className/performance` - Get performance records for a class
 
-## Database Schema
+## Database Schema.
 
 The system uses SQLite with the following tables:
 - `students` - Student information

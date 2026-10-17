@@ -5,12 +5,12 @@ A comprehensive student management system for primary schools with features for 
 Features
 
 1. Student Registration**
-   - Register new students with personal and parent information
-   - Assign students to classes
+   . Register new students with personal and parent information
+   .Assign students to classes
 
    2.**Performance Tracking**
-   - Record student performance by subject and term
-   - Track grades and scores
+   . Record student performance by subject and term
+   . Track grades and scores
 
 3. Fees Management
    - Record school fees payments

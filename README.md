@@ -35,7 +35,7 @@ Features
    ```
 5. Open your browser and navigate to `http://localhost:3000`
 
-## Default Login Credentials.
+# Default Login Credentials.
 
 - Admin: username: `admin`, password: `admin123`
 

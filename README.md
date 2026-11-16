@@ -37,7 +37,7 @@ Features
 
 # Default Login Credentials.
 
-- Admin: username: `admin`, password: `admin123`
+- Admin:  username: `admin`, password: `admin123`
 
 ##System Architecture
 
@@ -53,18 +53,18 @@ Features
 - GET `/api/students/:id` - Get a specific student
 
 ### Performance Tracking.
-- POST `/api/performance/add` - Add student performance record
-- GET `/api/performance/student/:studentId` - Get performance records for a student
+- POST `/api/performance/add` - Add student performance  record
+- GET `/api/performance/student/:studentId` - Get performance  records for a student
 
 ### Fees Management.
 - POST `/api/fees/update` - Update student fees
-- GET `/api/fees/student/:studentId` - Get fees record for a student
+- GET `/api/fees/student/:studentId` - Get fees record for  a student
 - GET `/api/fees/all` - Get all fees records
 
 ### Class Management.
 - GET `/api/classes` - Get all classes with student counts
-- GET `/api/classes/:className/students` - Get students in a specific class
-- GET `/api/classes/:className/performance` - Get performance records for a class
+- GET `/api/classes/:className/students` - Get students in  a specific class
+- GET `/api/classes/:className/performance` - Get performance  records for a class
 
 ## Database Schema.
 

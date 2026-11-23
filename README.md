@@ -8,7 +8,7 @@ Features
    . Register new students with personal and parent information
    .Assign students to classes
 
-   2.Performance Tracking**
+   2.Performance  Tracking**
    . Record student performance by subject and term
    . Track grades and scores
 
@@ -16,7 +16,7 @@ Features
    - Record school fees payments
    - Track balances owed by students
 
-4. Administrative Dashboard**
+4. Administrative  Dashboard**
    - View class summaries
    - Monitor student performance across classes
    - Track fees collection
@@ -47,7 +47,7 @@ Features
 
 ##API Endpoints
 
-### Student Management
+### Student Manageument
 - POST `/api/students/register` - Register a new student
 - GET `/api/students` - Get all students
 - GET `/api/students/:id` - Get a specific student
@@ -68,7 +68,7 @@ Features
 
 ## Database Schema.
 
-The system uses SQLite with the following tables:
+The system uses  SQLite with the following tables:
 - `students` - Student information
 - `teachers` - Teacher information
 - `admins` - Administrator accounts

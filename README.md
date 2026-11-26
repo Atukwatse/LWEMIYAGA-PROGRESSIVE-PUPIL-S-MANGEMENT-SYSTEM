@@ -23,8 +23,8 @@ Features
 
 ## Setup Instructions
 
-1. Install Node.js (if not already installed)
-2. Open a terminal in the project directory
+1. Install Node.js (if not  already installed)
+2. Open a terminal in the  project directory
 3. Install dependencies:
    ```
    npm install

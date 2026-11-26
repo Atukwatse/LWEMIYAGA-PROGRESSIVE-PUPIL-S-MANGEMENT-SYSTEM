@@ -5,11 +5,11 @@ A comprehensive student management system for primary schools with features for 
 Features
 
 1. Student Registration**
-   . Register new students with personal and parent information
+   . Register new students with personal a nd parent information
    .Assign students to classes
 
    2.Performance  Tracking**
-   . Record student performance by subject and term
+   . Record student performance by subject  and term
    . Track grades and scores
 
 3. Fees Management
@@ -23,8 +23,8 @@ Features
 
 ## Setup Instructions
 
-1. Install Node.js (if not  already installed)
-2. Open a terminal in the  project directory
+1. Install Node.js (if not   already installed)
+2. Open a terminal in the  project  directory
 3. Install dependencies:
    ```
    npm install

@@ -1,11 +1,11 @@
 # Lwemiyaga Progressive Pupils Management System
 
-A comprehensive student management system for primary schools with features for student registration, performance trackings, fees management, and administrative reportings.
+A comprehensive student management system for primary schools with features  for student  registration, performance trackings, fees management, and administrative reportings.
 
 Features
 
 1. Student Registration**
-   . Register new students with personal a nd parent information
+   . Register new students with personal and parent information
    .Assign students to classes
 
    2.Performance  Tracking**
@@ -39,7 +39,7 @@ Features
 
 - Admin:  username: `admin`, password: `admin123`
 
-##System Architecture
+##System  Architecture
 
 - Backend: Node.js with Express framework
 - Database: SQLite (file-based, no separate installation required)
@@ -63,7 +63,7 @@ Features
 
 ### Class Management.
 - GET `/api/classes` - Get all classes with student counts
-- GET `/api/classes/:className/students` - Get students in  a specific class
+- GET `/api/classes/:className/students` - Get students in  a specific  class
 - GET `/api/classes/:className/performance` - Get performance  records for a class
 
 ## Database Schema.
